@@ -2,13 +2,13 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-teal-500 p-6 mt-auto">
+    <footer className="bg-teal-600 p-6 mt-auto">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-white text-sm">
         <div className="flex items-center gap-2">
           <span className="font-semibold text-lg tracking-tight">
             Yaw Company
           </span>
-          <span className="text-teal-200">|</span>
+          <span className="text-teal-100">|</span>
           <p>© {new Date().getFullYear()} All rights reserved.</p>
         </div>
 
