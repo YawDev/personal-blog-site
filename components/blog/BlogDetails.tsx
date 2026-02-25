@@ -1,3 +1,5 @@
+"use client";
+
 import { Blog } from "@/app/utils/types";
 import CallToAction from "../home/CallToAction";
 
