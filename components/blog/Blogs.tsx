@@ -3,7 +3,11 @@
 import { Blog } from "@/app/utils/types";
 import BlogItem from "./BlogItem";
 import ShowMoreButton from "./ShowMore";
+import { FormMode } from "@/app/utils/FormHelpers";
+import { useState } from "react";
 const BlogList = ({ blogs }: { blogs: Blog[] }) => {
+  const [mode, setMode] = useState<FormMode>(FormMode.Create);
+
   return (
     <section className="container mx-auto px-4 py-12">
       <div className="text-center mb-8">

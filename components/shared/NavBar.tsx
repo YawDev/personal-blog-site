@@ -12,7 +12,13 @@ const NavBar = () => {
             href="/blogs"
             className="block mt-4 lg:inline-block lg:mt-0 text-teal-100 hover:text-white mr-4"
           >
-            Blogs
+            View latest Posts
+          </a>
+          <a
+            href="/blogs/create"
+            className="block mt-4 lg:inline-block lg:mt-0 text-teal-100 hover:text-white mr-4"
+          >
+            Post new Blog
           </a>
         </div>
       </div>
