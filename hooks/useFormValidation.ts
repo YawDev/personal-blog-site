@@ -66,8 +66,11 @@ const useFormValidation = (initialValues: {
         // 4. Recalculate validForSubmit (Exclude it from the loop)
         const isFormValid =
           newState.title.error === "" &&
+          newState.title.value.trim() !== "" &&
           newState.preview.error === "" &&
-          newState.content.error === "";
+          newState.content.error === "" &&
+          newState.content.value.trim() !== "";
+        newState.content.error === "";
 
         return {
           ...newState,
@@ -87,8 +90,10 @@ const useFormValidation = (initialValues: {
         // Update validForSubmit based on all fields
         const isFormValid =
           newState.title.error === "" &&
+          newState.title.value.trim() !== "" &&
           newState.preview.error === "" &&
-          newState.content.error === "";
+          newState.content.error === "" &&
+          newState.content.value.trim() !== "";
 
         return { ...newState, validForSubmit: isFormValid as any };
       });
