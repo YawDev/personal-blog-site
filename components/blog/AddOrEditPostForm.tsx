@@ -7,6 +7,9 @@ import { Blog } from "@/app/utils/types";
 import ErrorMessage from "@/components/shared/ErrorMessage";
 import WritingTips from "./WritingTips";
 import BackToArticles from "./BackToArticles";
+import { useRouter } from "next/navigation";
+import { savePostsToLocalStorage } from "@/app/utils/InMemory";
+import { v4 as uuid } from "uuid";
 export function AddOrEditPostForm({
   mode,
   blogData,
@@ -14,6 +17,7 @@ export function AddOrEditPostForm({
   mode: FormMode;
   blogData: Blog | null;
 }) {
+  const router = useRouter();
   const { formState, handleInputChange, handleBlur } = useFormValidation({
     title: blogData?.title || "",
     preview: blogData?.preview || "",
@@ -54,6 +58,19 @@ export function AddOrEditPostForm({
             onSubmit={(e) => {
               e.preventDefault();
               // Handle form submission logic here
+
+              if (FormMode.Create === mode) {
+                // For now, we'll just log the form state. Replace with API call when ready.
+                const newBlog: Blog = {
+                  id: uuid(),
+                  title: formState.title.value,
+                  preview: formState.preview.value,
+                  content: formState.content.value,
+                  datePosted: new Date().toISOString(),
+                };
+                savePostsToLocalStorage(newBlog);
+                router.push(`/blogs/${newBlog.id}`);
+              }
             }}
           >
             {/* Title Field */}

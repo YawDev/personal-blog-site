@@ -1,3 +1,5 @@
+import { getFromLocalStorage } from "@/app/utils/LocalStorage";
+import { Blog } from "@/app/utils/types";
 import BlogDetails from "@/components/blog/BlogDetails";
 import { Metadata } from "next";
 
@@ -15,16 +17,22 @@ export default async function Page({
 
   console.log(id);
 
+  let fetchedBlog: Blog | null = null;
+
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
   return (
     <>
       <BlogDetails
-        blog={{
-          id: "1",
-          title: "Here is a sample blog post",
-          datePosted: new Date(),
-          content: "This is the content of the blog post.",
-          preview: "This is the preview of the blog post.",
-        }}
+        fetchedBlog={
+          fetchedBlog || {
+            id: id, // Using passed ID to get blog from localStorage in client component
+            title: "Here is a sample blog post", // Placeholder title
+            datePosted: new Date().toISOString(), // Placeholder date
+            content: "This is the content of the blog post.", // Placeholder content
+            preview: "This is the preview of the blog post.", // Placeholder preview
+          }
+        }
       />
     </>
   );
