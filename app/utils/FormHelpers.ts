@@ -22,20 +22,20 @@ export const FormValidationResult = (field: string, value: string): string => {
 };
 
 const getFieldError = (field: string, value: string): string => {
-  const alphaumericRegex = /^[a-zA-Z0-9]+$/;
+  const alphaumericRegex = /^[a-zA-Z0-9\s.,!?':"()-]+$/;
 
   switch (field) {
     case "title":
       if (!value) return "Title is required";
       if (!alphaumericRegex.test(value))
-        return "Only letters and numbers allowed";
+        return "Only letters, numbers, and basic punctuation allowed";
       if (value.length < 5) return "Title must be at least 5 characters";
 
       return "";
 
     case "preview":
       if (value && !alphaumericRegex.test(value))
-        return "Only letters and numbers allowed";
+        return "Only letters, numbers, and basic punctuation allowed";
       if (value && value.length > 100)
         return "Preview must be under 100 characters";
 
@@ -44,7 +44,7 @@ const getFieldError = (field: string, value: string): string => {
     case "content":
       if (!value) return "Content is required";
       if (!alphaumericRegex.test(value))
-        return "Only letters and numbers allowed";
+        return "Only letters, numbers, and basic punctuation allowed";
       if (value.length < 20) return "Content is too short";
       return "";
 

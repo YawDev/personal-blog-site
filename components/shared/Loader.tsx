@@ -4,12 +4,12 @@ const Loader = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gradient-to-br from-teal-50 to-white py-16">
       <div className="relative">
-        {/* Outer spinning ring */}
-        <div className="w-16 h-16 border-4 border-teal-200 rounded-full animate-spin border-t-teal-600"></div>
+        {/* Outer spinning ring - smaller */}
+        <div className="w-10 h-10 border-3 border-teal-200 rounded-full animate-spin border-t-teal-600"></div>
 
-        {/* Inner pulsing dot */}
+        {/* Inner pulsing dot - smaller */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-3 h-3 bg-teal-600 rounded-full animate-pulse"></div>
+          <div className="w-2 h-2 bg-teal-600 rounded-full animate-pulse"></div>
         </div>
       </div>
 
@@ -21,11 +21,11 @@ const Loader = () => {
         </p>
       </div>
 
-      {/* Animated dots */}
-      <div className="flex space-x-1 mt-4">
-        <div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce"></div>
-        <div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce delay-75"></div>
-        <div className="w-2 h-2 bg-teal-600 rounded-full animate-bounce delay-150"></div>
+      {/* Animated dots - bigger and more bouncy */}
+      <div className="flex space-x-2 mt-4">
+        <div className="w-4 h-4 bg-teal-600 rounded-full animate-bounce [animation-duration:1s] [animation-delay:0s]"></div>
+        <div className="w-4 h-4 bg-teal-600 rounded-full animate-bounce [animation-duration:1s] [animation-delay:0.2s]"></div>
+        <div className="w-4 h-4 bg-teal-600 rounded-full animate-bounce [animation-duration:1s] [animation-delay:0.4s]"></div>
       </div>
     </div>
   );

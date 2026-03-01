@@ -2,17 +2,48 @@
 
 import { Blog } from "@/app/utils/types";
 import CallToAction from "../home/CallToAction";
+import { getFromLocalStorage } from "@/app/utils/LocalStorage";
+import { useEffect, useState } from "react";
 
-const BlogDetails = ({ blog }: { blog: Blog }) => {
-  const formatDate = (date: Date) => {
+const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog }) => {
+  const formatDate = (date: string) => {
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
-    }).format(date);
+    }).format(new Date(date));
   };
+  const [isLoading, setIsLoading] = useState(true);
 
-  const estimatedReadTime = Math.ceil(blog.content.split(" ").length / 200);
+  const [currentArticle, setCurrentArticle] = useState<Blog>(fetchedBlog);
+
+  const estimatedReadTime = Math.ceil(
+    currentArticle.content.split(" ").length / 200,
+  );
+
+  useEffect(() => {
+    // Remove localStorage once API is integrated and replace with fetchedBlog
+    var localStorage: any = getFromLocalStorage("blogs");
+    console.log("Local Storage Blogs:", localStorage);
+    var blogFromStorage: Blog | null = localStorage
+      ? JSON.parse(localStorage).find(
+          (b: { id: string }) => b.id === fetchedBlog.id,
+        )
+      : null;
+
+    //Until we have an API, we'll check localStorage for the blog post details first, then fall back to the passed fetchedBlog (which is just a placeholder with the correct ID)
+    // Set state to the blog from localStorage if found, otherwise use the fetchedBlog (which is just a placeholder with the correct ID until we integrate the API)
+    if (blogFromStorage) {
+      setCurrentArticle(blogFromStorage);
+    } else {
+      setCurrentArticle(fetchedBlog);
+    }
+    setIsLoading(false);
+  }, []);
+
+  if (isLoading) {
+    return null; // Let the server loading handle this
+  }
 
   return (
     <article className="bg-white">
@@ -42,7 +73,7 @@ const BlogDetails = ({ blog }: { blog: Blog }) => {
           </div>
 
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-            {blog.title}
+            {currentArticle.title}
           </h1>
 
           <div className="flex flex-wrap items-center gap-6 text-gray-600">
@@ -60,7 +91,7 @@ const BlogDetails = ({ blog }: { blog: Blog }) => {
                   d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
-              {formatDate(blog.datePosted)}
+              {formatDate(currentArticle.datePosted)}
             </div>
             <div className="flex items-center">
               <svg
@@ -86,19 +117,21 @@ const BlogDetails = ({ blog }: { blog: Blog }) => {
       <main className="py-12 px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
           {/* Article Preview/Summary */}
-          {blog.preview && (
+          {currentArticle.preview && (
             <div className="bg-teal-50 border-l-4 border-teal-600 p-6 mb-8 rounded-r-lg">
               <h2 className="text-lg font-semibold text-teal-900 mb-2">
                 Article Summary
               </h2>
-              <p className="text-teal-800 leading-relaxed">{blog.preview}</p>
+              <p className="text-teal-800 leading-relaxed">
+                {currentArticle.preview}
+              </p>
             </div>
           )}
 
           {/* Main Content */}
           <div className="prose prose-lg prose-gray max-w-none">
             <div className="whitespace-pre-wrap leading-relaxed text-gray-700 text-lg">
-              {blog.content}
+              {currentArticle.content}
             </div>
           </div>
 
