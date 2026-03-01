@@ -4,6 +4,8 @@ import { Blog } from "@/app/utils/types";
 import CallToAction from "../home/CallToAction";
 import { getFromLocalStorage } from "@/app/utils/LocalStorage";
 import { useEffect, useState } from "react";
+import BackToArticles from "./BackToArticles";
+import EditPostLink from "./SaveBlogPost/EditPostLink";
 
 const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog }) => {
   const formatDate = (date: string) => {
@@ -50,28 +52,10 @@ const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog }) => {
       {/* Hero Section */}
       <header className="bg-gradient-to-br from-teal-50 to-white py-16 px-6 lg:px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-6">
-            <a
-              href="/blogs"
-              className="inline-flex items-center text-teal-600 hover:text-teal-800 font-medium transition-colors duration-200"
-            >
-              <svg
-                className="w-4 h-4 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Back to Articles
-            </a>
+          <div className="flex justify-between items-center mb-8">
+            <BackToArticles />
+            <EditPostLink id={currentArticle.id} />
           </div>
-
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
             {currentArticle.title}
           </h1>
