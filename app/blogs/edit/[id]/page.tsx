@@ -1,6 +1,6 @@
 import { FormMode } from "@/app/utils/FormHelpers";
 import { Blog } from "@/app/utils/types";
-import { AddOrEditPostForm } from "@/components/blog/SaveBlogPost/AddOrEditPostForm";
+import { AddOrEditPostForm } from "@/components/blog/saveBlogPost/AddOrEditPostForm";
 
 export default async function EditBlogPost({
   params,

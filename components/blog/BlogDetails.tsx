@@ -5,7 +5,7 @@ import CallToAction from "../home/CallToAction";
 import { getFromLocalStorage } from "@/app/utils/LocalStorage";
 import { useEffect, useState } from "react";
 import BackToArticles from "./BackToArticles";
-import EditPostLink from "./SaveBlogPost/EditPostLink";
+import EditPostLink from "./saveBlogPost/EditPostLink";
 
 const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog }) => {
   const formatDate = (date: string) => {
