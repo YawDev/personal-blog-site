@@ -100,10 +100,24 @@ const useFormValidation = (initialValues: {
     }
   };
 
+  const loadExistingData = (data: {
+    title: string;
+    preview: string;
+    content: string;
+  }) => {
+    setFormState({
+      title: { value: data.title, error: "", touched: false },
+      preview: { value: data.preview, error: "", touched: false },
+      content: { value: data.content, error: "", touched: false },
+      validForSubmit: true,
+    });
+  };
+
   return {
     formState,
     handleInputChange,
     handleBlur,
+    loadExistingData,
   };
 };
 
