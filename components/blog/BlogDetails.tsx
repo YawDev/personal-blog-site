@@ -1,8 +1,8 @@
 "use client";
 
-import { Blog } from "@/app/utils/types";
+import { Blog } from "@/utils/types";
 import CallToAction from "../home/CallToAction";
-import { getFromLocalStorage } from "@/app/utils/LocalStorage";
+import { getFromLocalStorage } from "@/utils/LocalStorage";
 import { useEffect, useState } from "react";
 import BackToArticles from "./BackToArticles";
 import EditPostLink from "./save/EditPostLink";

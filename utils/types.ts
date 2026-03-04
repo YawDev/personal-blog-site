@@ -5,3 +5,8 @@ export type Blog = {
   datePosted: string;
   preview: string;
 };
+
+export enum ThemeMode {
+  Light,
+  Dark,
+}

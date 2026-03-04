@@ -1,5 +1,5 @@
 import BlogList from "@/components/blog/Blogs";
-import { Blog } from "../utils/types";
+import { Blog } from "../../utils/types";
 
 export default async function BlogsPage() {
   let fetchedBlogs: Blog[] | null = null;

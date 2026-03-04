@@ -2,6 +2,8 @@ import NavBar from "@/components/shared/NavBar";
 import type { Metadata } from "next";
 import "./globals.css";
 import Footer from "@/components/shared/Footer";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { MainWrapper } from "@/components/providers/MainWrapper";
 
 export const metadata: Metadata = {
   title: "Personal Blog",
@@ -16,12 +18,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       {/* min-h-screen ensures the body takes up at least the full height of the viewport */}
-      <body className="flex flex-col min-h-screen">
-        <NavBar />
-        {/* flex-grow pushes the footer down by taking up all available space */}
-        <main className="flex-grow">{children}</main>
-        <Footer />
-      </body>
+      <ThemeProvider>
+        <body className="flex flex-col min-h-screen">
+          <NavBar />
+          {/* flex-grow pushes the footer down by taking up all available space */}
+          <MainWrapper>{children}</MainWrapper>
+          <Footer />
+        </body>
+      </ThemeProvider>
     </html>
   );
 }

@@ -1,5 +1,5 @@
-import { getFromLocalStorage } from "@/app/utils/LocalStorage";
-import { Blog } from "@/app/utils/types";
+import { getFromLocalStorage } from "@/utils/LocalStorage";
+import { Blog } from "@/utils/types";
 import BlogDetails from "@/components/blog/BlogDetails";
 import { Metadata } from "next";
 

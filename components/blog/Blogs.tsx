@@ -1,13 +1,17 @@
 "use client";
 
-import { Blog } from "@/app/utils/types";
+import { Blog } from "@/utils/types";
 import BlogItem from "./BlogItem";
 import ShowMoreButton from "./ShowMore";
-import { FormMode } from "@/app/utils/FormHelpers";
-import { useEffect, useState } from "react";
-import { getFromLocalStorage } from "@/app/utils/LocalStorage";
+import { FormMode } from "@/utils/FormHelpers";
+import { useEffect, useState, useContext } from "react";
+import { getFromLocalStorage } from "@/utils/LocalStorage";
+import ThemeContext from "@/context/ThemeContext";
+import { ThemeMode } from "@/utils/types";
 const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
   const [mode, setMode] = useState<FormMode>(FormMode.Create);
+  const themeContext = useContext(ThemeContext);
+  const isDark = themeContext?.theme === ThemeMode.Dark;
 
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,12 +33,34 @@ const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
   return blogs?.length === 0 ? (
     <section className="container mx-auto px-4 py-20">
       <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Latest Posts</h2>
+        <h2
+          className={
+            isDark
+              ? "text-3xl font-bold text-white mb-2"
+              : "text-3xl font-bold text-gray-900 mb-2"
+          }
+        >
+          Latest Posts
+        </h2>
       </div>
-      <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-16 text-center border border-gray-100">
-        <div className="w-24 h-24 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-8">
+      <div
+        className={
+          isDark
+            ? "max-w-2xl mx-auto bg-slate-800 rounded-2xl shadow-2xl p-16 text-center border border-slate-700"
+            : "max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-16 text-center border border-gray-100"
+        }
+      >
+        <div
+          className={
+            isDark
+              ? "w-24 h-24 bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-8"
+              : "w-24 h-24 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-8"
+          }
+        >
           <svg
-            className="w-12 h-12 text-teal-600"
+            className={
+              isDark ? "w-12 h-12 text-slate-400" : "w-12 h-12 text-teal-600"
+            }
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -47,16 +73,32 @@ const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
             />
           </svg>
         </div>
-        <h3 className="text-3xl font-semibold text-gray-900 mb-4">
+        <h3
+          className={
+            isDark
+              ? "text-3xl font-semibold text-white mb-4"
+              : "text-3xl font-semibold text-gray-900 mb-4"
+          }
+        >
           No Articles Yet
         </h3>
-        <p className="text-lg text-gray-600 mb-8">
+        <p
+          className={
+            isDark
+              ? "text-lg text-slate-300 mb-8"
+              : "text-lg text-gray-600 mb-8"
+          }
+        >
           Be the first to share your insights! Create your first article to get
           started.
         </p>
         <a
           href="/blogs/create"
-          className="inline-flex items-center px-8 py-4 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 shadow-lg hover:shadow-xl text-lg"
+          className={
+            isDark
+              ? "inline-flex items-center px-8 py-4 bg-slate-600 text-white font-semibold rounded-xl hover:bg-slate-500 transition-colors duration-200 shadow-lg hover:shadow-slate-500/20 text-lg"
+              : "inline-flex items-center px-8 py-4 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 shadow-lg hover:shadow-xl text-lg"
+          }
         >
           <svg
             className="w-6 h-6 mr-3"
@@ -78,7 +120,15 @@ const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
   ) : (
     <section className="container mx-auto px-4 py-12">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Latest Posts</h2>
+        <h2
+          className={
+            isDark
+              ? "text-3xl font-bold text-white mb-2"
+              : "text-3xl font-bold text-gray-900 mb-2"
+          }
+        >
+          Latest Posts
+        </h2>
       </div>
       <div className="flex flex-wrap -mx-4">
         {blogs.map((blog) => (

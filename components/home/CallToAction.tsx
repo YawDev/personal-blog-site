@@ -1,6 +1,11 @@
-import React from "react";
+import ThemeContext from "@/context/ThemeContext";
+import { ThemeMode } from "@/utils/types";
+import React, { useContext } from "react";
 
 const CallToAction = () => {
+  const themeContext = useContext(ThemeContext);
+  const isDark = themeContext?.theme === ThemeMode.Dark;
+
   return (
     <section className="bg-gray-100 py-16 px-6 lg:px-8">
       <div className="max-w-4xl mx-auto text-center">

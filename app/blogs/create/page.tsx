@@ -1,5 +1,5 @@
 "use client";
-import { FormMode } from "@/app/utils/FormHelpers";
+import { FormMode } from "@/utils/FormHelpers";
 import { SavePostForm } from "@/components/blog/save/SavePostForm";
 
 const CreateBlogPage = () => {
