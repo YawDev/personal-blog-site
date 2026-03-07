@@ -38,6 +38,7 @@ export function PageArrow({
     <button
       onClick={(e) => {
         paginate(direction, e);
+        //Reset number of visible posts back to minimum value when user clicks navigates between pages.
         setVisiblePostsCount(minValueToDisplay);
       }}
       className={`${buttonBaseClasses} ${currentPage <= 1 ? `${disabledClasses} invisible` : ""}`}
