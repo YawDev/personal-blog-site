@@ -2,7 +2,6 @@ import {
   maxValueToDisplay,
   minValueToDisplay,
 } from "@/utils/VisiblePostSetttings";
-import React from "react";
 
 const ShowMoreButton = ({
   visiblePostsCount,

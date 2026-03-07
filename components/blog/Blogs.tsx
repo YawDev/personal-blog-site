@@ -55,7 +55,7 @@ const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
   }
 
   let currentItems = GetCurrentItems(filteredBlogs, paginationData);
-  const totalPostsOnThisPage = currentItems.length; // Before slicing!
+  const totalPostsOnThisPage = currentItems.length; // Actual total of available posts before slicing!
   currentItems = currentItems.slice(0, visiblePostsCount);
 
   return blogs?.length === 0 ? (
@@ -122,17 +122,20 @@ const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
         setPaginationData={setPaginationData}
         setVisiblePostsCount={setVisiblePostsCount}
       />
-      {totalPostsOnThisPage > minValueToDisplay ? (
-        <div className="flex justify-center mt-8">
-          <ShowMoreButton
-            visiblePostsCount={visiblePostsCount}
-            setVisiblePostsCount={setVisiblePostsCount}
-            totalPostsOnThisPage={totalPostsOnThisPage}
-          />
-        </div>
-      ) : (
-        <></>
-      )}
+      {
+        //Toggle show more/less with actual available number of posts on current page.
+        totalPostsOnThisPage > minValueToDisplay ? (
+          <div className="flex justify-center mt-8">
+            <ShowMoreButton
+              visiblePostsCount={visiblePostsCount}
+              setVisiblePostsCount={setVisiblePostsCount}
+              totalPostsOnThisPage={totalPostsOnThisPage}
+            />
+          </div>
+        ) : (
+          <></>
+        )
+      }
     </section>
   );
 };
