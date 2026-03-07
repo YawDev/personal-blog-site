@@ -7,10 +7,14 @@ import { useEffect, useState } from "react";
 import { getFromLocalStorage } from "@/utils/LocalStorage";
 import { GetCurrentItems } from "@/utils/Filtering";
 import Pagination from "./Pagination";
+import {
+  maxValueToDisplay,
+  minValueToDisplay,
+} from "@/utils/VisiblePostSetttings";
 const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [visiblePostsCount, setVisiblePostsCount] = useState(6);
+  const [visiblePostsCount, setVisiblePostsCount] = useState(minValueToDisplay);
 
   useEffect(() => {
     // Remove localStorage once API is integrated and replace with fetchedBlogs
@@ -23,7 +27,7 @@ const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
   }, []);
 
   const [paginationData, setPaginationData] = useState<IPagination>({
-    itemsPerPage: 9,
+    itemsPerPage: maxValueToDisplay,
     totalItems: blogs?.length ?? 0,
     currentPage: 1,
   });
@@ -116,7 +120,8 @@ const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
         paginationData={paginationData}
         setPaginationData={setPaginationData}
       />
-      {currentItems.length === 6 || currentItems.length === 9 ? (
+      {currentItems.length === minValueToDisplay ||
+      currentItems.length === maxValueToDisplay ? (
         <div className="flex justify-center mt-8">
           <ShowMoreButton
             visiblePostsCount={visiblePostsCount}
