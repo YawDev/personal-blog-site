@@ -1,11 +1,11 @@
 import WritingTips from "./WritingTips";
 import { InputFormField, TextAreaFormField } from "./InputFormField";
-import { FormMode, IFormState } from "@/utils/FormHelpers";
+import { FormMode, IFormState } from "@/utils/forms/FormHelpers";
 
 import PublishArticleButton from "./PublishArticleButton";
 import { useRouter } from "next/navigation";
-import { savePostToLocalStorage } from "@/utils/InMemory";
 import { SaveDraftButton } from "./SaveDraftButton";
+import { savePostToLocalStorage } from "@/utils/browser/InMemory";
 
 const SaveFormCard = ({
   mode,

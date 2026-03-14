@@ -1,4 +1,4 @@
-import { FormMode } from "@/utils/FormHelpers";
+import { FormMode } from "@/utils/forms/FormHelpers";
 
 const setPageTitle = (mode: FormMode) => {
   switch (mode) {

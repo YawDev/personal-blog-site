@@ -1,6 +1,6 @@
 import React from "react";
 
-const EditPostLink = ({ id }: { id: string }) => {
+const EditPostLink = ({ id }: { id: string | undefined }) => {
   return (
     <div className="mb-4">
       <a

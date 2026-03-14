@@ -1,7 +1,7 @@
 import {
   maxValueToDisplay,
   minValueToDisplay,
-} from "@/utils/VisiblePostSetttings";
+} from "@/utils/pagination/VisiblePostSetttings";
 
 const ShowMoreButton = ({
   visiblePostsCount,

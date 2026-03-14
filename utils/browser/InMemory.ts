@@ -1,6 +1,6 @@
-import { FormMode } from "./FormHelpers";
+import { FormMode } from "../forms/FormHelpers";
+import { Blog } from "../types";
 import { getFromLocalStorage, saveToLocalStorage } from "./LocalStorage";
-import { Blog } from "./types";
 import { v4 as uuid } from "uuid";
 
 export const savePostToLocalStorage = (
@@ -18,6 +18,7 @@ export const savePostToLocalStorage = (
         preview: formState.preview.value,
         content: formState.content.value,
         datePosted: new Date().toISOString(),
+        userId: "",
       };
       saveNewPostToLocalStorage(newBlog);
       router.push(`/blogs/${newBlog.id}`);
@@ -33,6 +34,7 @@ export const savePostToLocalStorage = (
         preview: formState.preview.value,
         content: formState.content.value,
         datePosted: new Date().toISOString(),
+        userId: "",
       });
       router.push(`/blogs/${newBlogId}`);
       break;

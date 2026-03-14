@@ -1,5 +1,5 @@
-import { FormMode, IFormState } from "@/utils/FormHelpers";
-import SaveDraftToLocalStorage from "@/utils/InMemory";
+import SaveDraftToLocalStorage from "@/utils/browser/InMemory";
+import { FormMode, IFormState } from "@/utils/forms/FormHelpers";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { useRouter } from "next/navigation";
 import { v4 as uuid } from "uuid";
