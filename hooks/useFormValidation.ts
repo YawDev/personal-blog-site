@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FormValidationResult, IFormState } from "@/utils/FormHelpers";
+import { FormValidationResult, IFormState } from "@/utils/forms/FormHelpers";
 
 const useFormValidation = (initialValues: {
   title: string;

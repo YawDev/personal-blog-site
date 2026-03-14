@@ -2,10 +2,10 @@
 
 import { Blog } from "@/utils/types";
 import CallToAction from "../home/CallToAction";
-import { getFromLocalStorage } from "@/utils/LocalStorage";
 import { useEffect, useState } from "react";
 import BackToArticles from "./BackToArticles";
 import EditPostLink from "./save/EditPostLink";
+import { getFromLocalStorage } from "@/utils/browser/LocalStorage";
 
 const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog }) => {
   const formatDate = (date: string) => {

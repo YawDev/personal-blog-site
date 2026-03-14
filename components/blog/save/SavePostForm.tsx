@@ -1,13 +1,13 @@
 "use client";
 
-import { FormMode } from "@/utils/FormHelpers";
+import { FormMode } from "@/utils/forms/FormHelpers";
 import useFormValidation from "@/hooks/useFormValidation";
 import { Blog } from "@/utils/types";
 import { useEffect, useState } from "react";
-import { getFromLocalStorage } from "@/utils/LocalStorage";
 import setPageTitle from "@/formHelpers/formUtils";
 import BackToArticles from "../BackToArticles";
 import SaveFormCard from "./SaveFormCard";
+import { getFromLocalStorage } from "@/utils/browser/LocalStorage";
 export function SavePostForm({
   mode,
   blogData,

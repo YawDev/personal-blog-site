@@ -4,13 +4,13 @@ import { Blog, IPagination } from "@/utils/types";
 import BlogItem from "./BlogItem";
 import ShowMoreButton from "./ShowMore";
 import { useEffect, useState } from "react";
-import { getFromLocalStorage } from "@/utils/LocalStorage";
-import { GetCurrentItems } from "@/utils/Filtering";
+import { GetCurrentItems } from "@/utils/pagination/Filtering";
 import Pagination from "./Pagination";
 import {
   maxValueToDisplay,
   minValueToDisplay,
-} from "@/utils/VisiblePostSetttings";
+} from "@/utils/pagination/VisiblePostSetttings";
+import { getFromLocalStorage } from "@/utils/browser/LocalStorage";
 const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
