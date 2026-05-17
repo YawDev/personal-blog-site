@@ -44,7 +44,8 @@ const getPostFieldError = (field: string, value: string): string => {
 };
 
 export const LoginFormValidationResult = (field: string, value: string) => {
-  return getCommonAuthFieldError(field, value);
+  if (field === "userName" && !value) return "Username is required";
+  if (field === "password" && !value) return "Password is required";
 };
 
 export const SignUpFormValidationResult = (field: string, value: string) => {
