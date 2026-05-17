@@ -97,8 +97,8 @@ const getCommonAuthFieldError = (field: string, value: string): string => {
 
     case "password":
       if (!value) return "Password is required";
-      // if (!passwordRegex.test(value))
-      //   return "Password must be at least 8 characters and include an uppercase letter, lowercase letter, number, and special character";
+      if (!passwordRegex.test(value))
+        return "Password must be at least 8 characters and include an uppercase letter, lowercase letter, number, and special character";
       return "";
 
     case "confirmPassword":

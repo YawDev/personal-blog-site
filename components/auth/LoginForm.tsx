@@ -6,7 +6,10 @@ import AlertMessage from "../shared/AlertMessage";
 import { useEffect, useState } from "react";
 import { LoginResponse, User } from "@/utils/types";
 import { useAuth } from "@/providers/auth-provider";
-import { useRouter } from "next/dist/client/components/navigation";
+import {
+  useRouter,
+  useSearchParams,
+} from "next/dist/client/components/navigation";
 
 const LoginForm = () => {
   const { setUser } = useAuth();
@@ -37,6 +40,20 @@ const LoginForm = () => {
       return () => clearTimeout(timer);
     }
   }, [alert.show]);
+
+  // Check for "registered=true" in query params to show success message after registration
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("registered") === "true") {
+      setAlert({
+        show: true,
+        message: "Account created! Please log in.",
+        apiStatus: 200,
+      });
+    }
+  }, [searchParams]);
+
   return (
     <>
       <section className="bg-gradient-to-br from-teal-50 via-white to-teal-100/40 min-h-screen py-16 px-6 lg:px-8">

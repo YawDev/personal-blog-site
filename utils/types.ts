@@ -1,5 +1,12 @@
 import { Dispatch, SetStateAction } from "react";
 
+// General Types
+export type Alert = {
+  show: boolean;
+  message: string;
+  apiStatus: number;
+};
+
 // Domain Entities
 export interface IPost {
   id: string;
@@ -53,6 +60,11 @@ export type IPagination = {
 export type LoginResponse = {
   status: number;
   data: User | null;
+  message: string;
+};
+
+export type SignUpResponse = {
+  status: number;
   message: string;
 };
 

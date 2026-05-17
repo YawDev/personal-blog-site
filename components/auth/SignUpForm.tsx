@@ -2,6 +2,11 @@ import BackToArticles from "../blog/BackToArticles";
 import useSignUpForm from "@/hooks/useSignUpForm";
 import { InputFormField } from "../blog/save/InputFormField";
 import { SignUpApi } from "@/service/PersonalBlogService";
+import router from "next/dist/shared/lib/router/router";
+import { useRouter } from "next/dist/client/components/navigation";
+import { useEffect, useState } from "react";
+import { Alert, SignUpResponse } from "@/utils/types";
+import AlertMessage from "../shared/AlertMessage";
 
 const SignUpForm = () => {
   const { formState, handleInputChange, handleBlur } = useSignUpForm({
@@ -12,6 +17,22 @@ const SignUpForm = () => {
     lastName: "",
     email: "",
   });
+  const router = useRouter();
+  const [alert, setAlert] = useState<Alert>({
+    show: false,
+    message: "",
+    apiStatus: 0,
+  });
+
+  useEffect(() => {
+    if (alert.show) {
+      const timer = setTimeout(() => {
+        setAlert((prev) => ({ ...prev, show: false }));
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [alert.show]);
   return (
     <>
       {" "}
@@ -29,6 +50,21 @@ const SignUpForm = () => {
           </div>
         </div>
 
+        <div className="max-w-md mx-auto">
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-out ${
+              alert.show
+                ? "mb-4 max-h-24 opacity-100"
+                : "mb-0 max-h-0 opacity-0"
+            }`}
+          >
+            <AlertMessage
+              message={alert.message}
+              variant={alert.apiStatus !== 200 ? "error" : "default"}
+            />
+          </div>
+        </div>
+
         <div className="max-w-xl mx-auto">
           <div className="bg-white rounded-3xl shadow-[0_24px_60px_rgba(15,23,42,0.12)] border border-white/70 p-8 md:p-10">
             <form
@@ -36,9 +72,16 @@ const SignUpForm = () => {
               onSubmit={async (e) => {
                 e.preventDefault();
                 if (formState.validForSubmit) {
-                  var result = await SignUpApi(formState);
-                  if (result) {
-                    //successfully log user in. set loggedInState, userContext, redirect to /blogs
+                  let result: SignUpResponse = await SignUpApi(formState);
+                  if (result.status === 200 || result.status === 201) {
+                    router.push("/identity/login?registered=true");
+                  } else {
+                    setAlert((prev) => ({
+                      ...prev,
+                      show: true,
+                      message: result.message,
+                      apiStatus: result.status,
+                    }));
                   }
                 }
               }}
@@ -217,7 +260,12 @@ const SignUpForm = () => {
               {/* Submit */}
               <button
                 type="submit"
-                className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3.5 rounded-2xl transition-colors duration-200 shadow-sm mt-2"
+                className={`w-full bg-teal-600 text-white font-semibold py-3.5 rounded-2xl transition-all duration-200 shadow-sm mt-2 ${
+                  formState.validForSubmit
+                    ? "hover:bg-teal-700 cursor-pointer"
+                    : "opacity-40 blur-[0.5px] cursor-not-allowed"
+                }`}
+                disabled={!formState.validForSubmit}
               >
                 Sign Up
               </button>

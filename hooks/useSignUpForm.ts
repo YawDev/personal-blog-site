@@ -58,6 +58,10 @@ const useSignUpForm = (initialValues: {
 
     let result = SignUpFormValidationResult(field, value);
 
+    if (field === "confirmPassword" && !result && value !== formState.password.value) {
+      result = "Passwords do not match";
+    }
+
     if (result) {
       setFormState((prev) => {
         const fieldKey = field as keyof typeof prev;
@@ -81,6 +85,8 @@ const useSignUpForm = (initialValues: {
           newState.userName.value.trim() !== "" &&
           newState.password.error === "" &&
           newState.password.value.trim() !== "" &&
+          newState.confirmPassword.error === "" &&
+          newState.confirmPassword.value.trim() !== "" &&
           newState.firstName.error === "" &&
           newState.firstName.value.trim() !== "" &&
           newState.lastName.error === "" &&
@@ -108,6 +114,8 @@ const useSignUpForm = (initialValues: {
           newState.userName.value.trim() !== "" &&
           newState.password.error === "" &&
           newState.password.value.trim() !== "" &&
+          newState.confirmPassword.error === "" &&
+          newState.confirmPassword.value.trim() !== "" &&
           newState.firstName.error === "" &&
           newState.firstName.value.trim() !== "" &&
           newState.lastName.error === "" &&

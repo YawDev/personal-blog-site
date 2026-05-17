@@ -4,6 +4,7 @@ import {
   LoginRequest,
   LoginResponse,
   SignUpRequest,
+  SignUpResponse,
 } from "@/utils/types";
 import axios from "axios";
 import { createHttpClient } from "@/utils/httpClientUtil";
@@ -106,7 +107,9 @@ export const LoginApi = async (body: LoginRequest): Promise<LoginResponse> => {
   return res;
 };
 
-export const SignUpApi = async (data: ISignUpFormState): Promise<boolean> => {
+export const SignUpApi = async (
+  data: ISignUpFormState,
+): Promise<SignUpResponse> => {
   let body: SignUpRequest = {
     userName: data.userName.value,
     password: data.password.value,
@@ -123,11 +126,25 @@ export const SignUpApi = async (data: ISignUpFormState): Promise<boolean> => {
     })
     .then((response) => {
       console.log("Account successfully registered!");
-      return true;
+      return {
+        status: response.status,
+        message: "Account successfully registered!",
+      };
     })
     .catch((error) => {
+      if (error.response?.status === 400) {
+        console.error("Registration failed: ", error.response.data);
+        return {
+          status: error.response.status,
+          message: error.response.data?.message ?? "Registration failed",
+        };
+      }
+
       console.error("Error signing up user: ", error);
-      return false;
+      return {
+        status: error.response?.status ?? 500,
+        message: "Error signing up user.",
+      };
     });
   return user;
 };
