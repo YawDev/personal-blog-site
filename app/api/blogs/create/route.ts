@@ -7,11 +7,22 @@ export async function POST(request: Request) {
   try {
     const body: SavePostRequest = await request.json();
     const httpClient = createHttpClient();
+
+    const cookieHeader = request.headers.get("cookie") ?? "";
+    const accessToken = cookieHeader
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith("access_token="))
+      ?.slice("access_token=".length);
+
     const response = await httpClient.post(
       `/blogs/create/${body.userId}`,
       body,
       {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+        },
       },
     );
 

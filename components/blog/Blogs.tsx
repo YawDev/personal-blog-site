@@ -1,6 +1,6 @@
 "use client";
 
-import { Blog, IPagination } from "@/types/types";
+import { Blog, IPagination, User } from "@/types/types";
 import BlogItem from "./BlogItem";
 import ShowMoreButton from "./ShowMore";
 import { useEffect, useState } from "react";
@@ -10,7 +10,13 @@ import {
   maxValueToDisplay,
   minValueToDisplay,
 } from "@/utils/pagination/VisiblePostSetttings";
-const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
+const BlogList = ({
+  fetchedBlogs,
+  currentUser,
+}: {
+  fetchedBlogs: Blog[];
+  currentUser: User | null;
+}) => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [visiblePostsCount, setVisiblePostsCount] = useState(minValueToDisplay);
@@ -113,7 +119,7 @@ const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
       </div>
       <div className="flex flex-wrap -mx-4">
         {currentItems.map((blog) => (
-          <BlogItem key={blog.id} blog={blog} />
+          <BlogItem key={blog.id} blog={blog} currentUser={currentUser} />
         ))}
       </div>
       <Pagination
