@@ -1,4 +1,4 @@
-import { Blog } from "@/utils/types";
+import { Blog } from "@/types/types";
 import Link from "next/link";
 import { Dispatch, SetStateAction } from "react";
 

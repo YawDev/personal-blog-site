@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { createHttpClient } from "@/utils/httpClientUtil";
 import { normalizeUser } from "@/utils/mapping/mappers";
-import { User } from "@/utils/types";
+import { User } from "@/types/types";
 
 // Utility function to fetch the current user on the server side
 // Authenticate user before rendering pages and provide user data to components via context

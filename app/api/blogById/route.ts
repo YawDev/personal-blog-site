@@ -1,5 +1,5 @@
 import { normalizePost } from "@/utils/mapping/mappers";
-import { UpstreamBlogByIdResponse } from "@/utils/types";
+import { UpstreamBlogByIdResponse } from "@/types/types";
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { createHttpClient } from "@/utils/httpClientUtil";

@@ -1,6 +1,6 @@
 "use client";
 
-import { Blog } from "@/utils/types";
+import { Blog } from "@/types/types";
 import CallToAction from "../home/CallToAction";
 import { useEffect, useState } from "react";
 import BackToArticles from "./BackToArticles";

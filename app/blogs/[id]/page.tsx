@@ -1,4 +1,4 @@
-import { Blog } from "@/utils/types";
+import { Blog } from "@/types/types";
 import BlogDetails from "@/components/blog/BlogDetails";
 import { Metadata } from "next";
 import { GetPostsById } from "@/service/PersonalBlogService";

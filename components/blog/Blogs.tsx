@@ -1,6 +1,6 @@
 "use client";
 
-import { Blog, IPagination } from "@/utils/types";
+import { Blog, IPagination } from "@/types/types";
 import BlogItem from "./BlogItem";
 import ShowMoreButton from "./ShowMore";
 import { useEffect, useState } from "react";

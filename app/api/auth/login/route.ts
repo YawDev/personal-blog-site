@@ -1,5 +1,5 @@
 import { normalizeUser } from "@/utils/mapping/mappers";
-import { UpstreamLoginResponse } from "@/utils/types";
+import { UpstreamLoginResponse } from "@/types/types";
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { createHttpClient } from "@/utils/httpClientUtil";

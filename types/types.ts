@@ -49,6 +49,13 @@ export type SignUpRequest = {
   email: string;
 };
 
+export type SavePostRequest = {
+  title: string;
+  content: string;
+  preview: string;
+  userId: string | null;
+};
+
 // Pagination
 export type IPagination = {
   itemsPerPage: number;
@@ -56,7 +63,7 @@ export type IPagination = {
   currentPage: number;
 };
 
-// API Error Response
+// BFF API Response
 export type LoginResponse = {
   status: number;
   data: User | null;
@@ -64,6 +71,11 @@ export type LoginResponse = {
 };
 
 export type SignUpResponse = {
+  status: number;
+  message: string;
+};
+
+export type SavePostResponse = {
   status: number;
   message: string;
 };

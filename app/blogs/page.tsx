@@ -1,5 +1,5 @@
 import BlogList from "@/components/blog/Blogs";
-import { Blog } from "../../utils/types";
+import { Blog } from "../../types/types";
 import { GetAllPosts } from "@/service/PersonalBlogService";
 
 export default async function BlogsPage() {

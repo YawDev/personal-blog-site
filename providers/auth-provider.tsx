@@ -1,5 +1,5 @@
 "use client";
-import { IUserContext, User } from "@/utils/types";
+import { IUserContext, User } from "@/types/types";
 import { createContext, useContext, useMemo, useState } from "react";
 
 const AuthContext = createContext<IUserContext>({

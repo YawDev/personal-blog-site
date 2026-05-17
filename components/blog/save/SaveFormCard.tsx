@@ -7,6 +7,12 @@ import { SaveDraftButton } from "./SaveDraftButton";
 import { savePostToLocalStorage } from "@/utils/browser/InMemory";
 import { FormMode } from "@/utils/forms/FormHelpers";
 import { IPostFormState } from "@/formHelpers/formTypes";
+import { create } from "domain";
+import { createPostApi } from "@/service/PersonalBlogService";
+import { useAuth } from "@/providers/auth-provider";
+import { Alert, SavePostResponse } from "@/types/types";
+import { useEffect, useState } from "react";
+import AlertMessage from "@/components/shared/AlertMessage";
 
 const SaveFormCard = ({
   mode,
@@ -22,17 +28,74 @@ const SaveFormCard = ({
   idParam?: string;
 }) => {
   const router = useRouter();
+  const { user } = useAuth();
+  const [alert, setAlert] = useState<Alert>({
+    show: false,
+    message: "",
+    apiStatus: 0,
+  });
+
+  useEffect(() => {
+    if (alert.show) {
+      const timer = setTimeout(() => {
+        setAlert((prev) => ({ ...prev, show: false }));
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [alert.show]);
+
+  const handleCreatePost = async (): Promise<SavePostResponse> => {
+    let result = await createPostApi(user?.id || "", {
+      title: formState.title.value,
+      content: formState.content.value,
+      preview: formState.preview.value,
+      id: "",
+      datePosted: "",
+      userId: user?.id || "",
+    });
+
+    return result;
+  };
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
       <form
         className="space-y-8"
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
           // Handle form submission logic here
-          savePostToLocalStorage(mode, formState, idParam, router);
+          //savePostToLocalStorage(mode, formState, idParam, router);
+          if (mode === FormMode.Create) {
+            let result = await handleCreatePost();
+            if (result.status === 200) {
+              router.push("/blogs");
+            } else {
+              //handle error case, show alert or something
+              setAlert({
+                show: true,
+                message: result.message,
+                apiStatus: result.status,
+              });
+            }
+          }
+          //Do rest for editing (both draft and published)
         }}
       >
+        <div className="max-w-md mx-auto">
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-out ${
+              alert.show
+                ? "mb-4 max-h-24 opacity-100"
+                : "mb-0 max-h-0 opacity-0"
+            }`}
+          >
+            <AlertMessage
+              message={alert.message}
+              variant={alert.apiStatus !== 200 ? "error" : "default"}
+            />
+          </div>
+        </div>
         {/* Title Field */}
         <InputFormField
           formLabelProps={{

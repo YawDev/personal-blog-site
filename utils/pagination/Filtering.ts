@@ -1,4 +1,4 @@
-import { Blog, IPagination } from "../types";
+import { Blog, IPagination } from "../../types/types";
 
 export const GetCurrentItems = (
   filteredBlogs: Blog[],
