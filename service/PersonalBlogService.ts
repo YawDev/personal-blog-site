@@ -3,9 +3,11 @@ import {
   Blog,
   LoginRequest,
   LoginResponse,
+  SavePostRequest,
+  SavePostResponse,
   SignUpRequest,
   SignUpResponse,
-} from "@/utils/types";
+} from "@/types/types";
 import axios from "axios";
 import { createHttpClient } from "@/utils/httpClientUtil";
 
@@ -164,4 +166,95 @@ export const logoutApi = async (): Promise<boolean> => {
       return false;
     });
   return user;
+};
+
+export const createPostApi = async (
+  id: string,
+  data: Blog,
+): Promise<SavePostResponse> => {
+  let body: SavePostRequest = {
+    title: data.title,
+    content: data.content,
+    preview: data.preview,
+    userId: data.userId,
+  };
+
+  var res = await axios
+    .post(`${getBffBaseUrl()}/api/blogs/create`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Blog created successfully: ", response.data);
+      return {
+        status: response.status,
+        message: "Blog created successfully",
+      };
+    })
+    .catch((error) => {
+      const status = error.response?.status;
+      if (status && status >= 400 && status < 500) {
+        console.error("Not able to create blog: ", error.response.data);
+        return {
+          status,
+          message:
+            error.response.data?.Message ??
+            error.response.data?.message ??
+            "Not able to create blog.",
+        };
+      }
+
+      console.error("Error creating blog: ", error);
+      return {
+        status: status ?? 500,
+        message: "Error creating blog.",
+      };
+    });
+  return res;
+};
+
+export const editPostApi = async (
+  _userId: string,
+  data: Blog,
+): Promise<SavePostResponse> => {
+  let body: SavePostRequest & { postId: string } = {
+    title: data.title,
+    content: data.content,
+    preview: data.preview,
+    userId: data.userId,
+    postId: data.id,
+  };
+
+  var res = await axios
+    .put(`${getBffBaseUrl()}/api/blogs/edit`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Blog edited successfully: ", response.data);
+      return {
+        status: response.status,
+        message: "Blog edited successfully",
+      };
+    })
+    .catch((error) => {
+      const status = error.response?.status;
+      if (status && status >= 400 && status < 500) {
+        console.error("Not able to edit blog: ", error.response.data);
+        return {
+          status,
+          message:
+            error.response.data?.Message ??
+            error.response.data?.message ??
+            "Not able to edit blog.",
+        };
+      }
+
+      console.error("Error editing blog: ", error);
+      return {
+        status: status ?? 500,
+        message: "Error editing blog.",
+      };
+    });
+  return res;
 };

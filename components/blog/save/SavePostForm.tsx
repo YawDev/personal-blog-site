@@ -2,7 +2,7 @@
 
 import { FormMode } from "@/utils/forms/FormHelpers";
 import useFormValidation from "@/hooks/usePostForm";
-import { Blog } from "@/utils/types";
+import { Blog } from "@/types/types";
 import { useEffect, useState } from "react";
 import setPageTitle from "@/formHelpers/formUtils";
 import BackToArticles from "../BackToArticles";
@@ -30,13 +30,14 @@ export function SavePostForm({
   useEffect(() => {
     if (mode === FormMode.EditPublished) {
       // Remove localStorage once API is integrated and replace with fetchedBlog
-      var localStorage: any = getFromLocalStorage("blogs");
-      console.log("Local Storage Blogs:", localStorage);
-      const blogToEdit = localStorage
-        ? JSON.parse(localStorage).find(
-            (b: { id: string }) => b.id === blogData?.id,
-          )
-        : null;
+      // var localStorage: any = getFromLocalStorage("blogs");
+      // console.log("Local Storage Blogs:", localStorage);
+      // const blogToEdit = localStorage
+      //   ? JSON.parse(localStorage).find(
+      //       (b: { id: string }) => b.id === blogData?.id,
+      //     )
+      //   : null;
+      const blogToEdit = blogData; // Replace with API fetched blog once integrated
       if (blogToEdit) {
         setCurrentBlogData(blogToEdit);
         loadExistingData(blogToEdit);
@@ -83,7 +84,7 @@ export function SavePostForm({
           formState={formState}
           handleInputChange={handleInputChange}
           handleBlur={handleBlur}
-          idParam={blogData?.id}
+          blogData={blogData ?? null}
         />
       </div>
     </section>

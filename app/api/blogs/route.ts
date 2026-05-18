@@ -2,7 +2,7 @@ import { normalizePosts } from "@/utils/mapping/mappers";
 import { NextResponse } from "next/server";
 import axios from "axios";
 import { createHttpClient } from "@/utils/httpClientUtil";
-import { UpstreamBlogsResponse } from "@/utils/types";
+import { UpstreamBlogsResponse } from "@/types/types";
 
 export async function GET(request: Request) {
   try {

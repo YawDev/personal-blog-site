@@ -1,6 +1,6 @@
 "use client";
 
-import { Blog, IPagination } from "@/utils/types";
+import { Blog, IPagination, User } from "@/types/types";
 import BlogItem from "./BlogItem";
 import ShowMoreButton from "./ShowMore";
 import { useEffect, useState } from "react";
@@ -10,10 +10,17 @@ import {
   maxValueToDisplay,
   minValueToDisplay,
 } from "@/utils/pagination/VisiblePostSetttings";
-const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
+const BlogList = ({
+  fetchedBlogs,
+  currentUser,
+}: {
+  fetchedBlogs: Blog[];
+  currentUser: User | null;
+}) => {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [visiblePostsCount, setVisiblePostsCount] = useState(minValueToDisplay);
+  const [showMyPostsOnly, setShowMyPostsOnly] = useState(false);
 
   useEffect(() => {
     // Remove localStorage once API is integrated and replace with fetchedBlogs
@@ -31,8 +38,12 @@ const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
     currentPage: 1,
   });
 
-  //TODO: Add search query
-  const filteredBlogs = blogs;
+  // When showMyPostsOnly is true, keep only posts the logged-in user wrote.
+  // currentUser is null when nobody is logged in, so the filter is always off then.
+  const filteredBlogs =
+    showMyPostsOnly && currentUser
+      ? blogs.filter((blog) => blog.userId === currentUser.id)
+      : blogs;
 
   //   blogs.filter((blog) => {
   //   return blog.title.toLowerCase().includes("j".toLowerCase() || "");
@@ -110,10 +121,25 @@ const BlogList = ({ fetchedBlogs }: { fetchedBlogs: Blog[] }) => {
     <section className="container mx-auto px-4 py-12">
       <div className="text-center mb-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Latest Posts</h2>
+        {currentUser && (
+          <button
+            onClick={() => {
+              setShowMyPostsOnly((prev) => !prev);
+              setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+            }}
+            className={`mt-3 px-4 py-2 rounded-full text-sm font-medium border transition-colors duration-200 ${
+              showMyPostsOnly
+                ? "bg-teal-600 text-white border-teal-600"
+                : "bg-white text-teal-600 border-teal-600 hover:bg-teal-50"
+            }`}
+          >
+            {showMyPostsOnly ? "Showing my posts" : "Show my posts"}
+          </button>
+        )}
       </div>
       <div className="flex flex-wrap -mx-4">
         {currentItems.map((blog) => (
-          <BlogItem key={blog.id} blog={blog} />
+          <BlogItem key={blog.id} blog={blog} currentUser={currentUser} />
         ))}
       </div>
       <Pagination

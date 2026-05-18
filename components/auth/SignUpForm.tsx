@@ -5,7 +5,7 @@ import { SignUpApi } from "@/service/PersonalBlogService";
 import router from "next/dist/shared/lib/router/router";
 import { useRouter } from "next/dist/client/components/navigation";
 import { useEffect, useState } from "react";
-import { Alert, SignUpResponse } from "@/utils/types";
+import { Alert, SignUpResponse } from "@/types/types";
 import AlertMessage from "../shared/AlertMessage";
 
 const SignUpForm = () => {

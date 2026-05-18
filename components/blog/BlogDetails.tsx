@@ -1,6 +1,6 @@
 "use client";
 
-import { Blog } from "@/utils/types";
+import { Blog } from "@/types/types";
 import CallToAction from "../home/CallToAction";
 import { useEffect, useState } from "react";
 import BackToArticles from "./BackToArticles";
@@ -8,7 +8,13 @@ import EditPostLink from "./save/EditPostLink";
 import { getFromLocalStorage } from "@/utils/browser/LocalStorage";
 import Link from "next/dist/client/link";
 
-const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog | null }) => {
+const BlogDetails = ({
+  fetchedBlog,
+  isLoggedIn,
+}: {
+  fetchedBlog: Blog | null;
+  isLoggedIn: boolean;
+}) => {
   const formatDate = (date: string | undefined) => {
     if (date) {
       return new Intl.DateTimeFormat("en-US", {
@@ -59,7 +65,7 @@ const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog | null }) => {
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <BackToArticles />
-            <EditPostLink id={currentArticle?.id} />
+            {isLoggedIn && <EditPostLink id={currentArticle?.id} />}
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
             {currentArticle?.title}

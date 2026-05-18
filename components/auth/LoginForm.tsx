@@ -4,7 +4,7 @@ import { InputFormField } from "../blog/save/InputFormField";
 import useLoginForm from "@/hooks/useLoginForm";
 import AlertMessage from "../shared/AlertMessage";
 import { useEffect, useState } from "react";
-import { LoginResponse, User } from "@/utils/types";
+import { LoginResponse, User } from "@/types/types";
 import { useAuth } from "@/providers/auth-provider";
 import {
   useRouter,
