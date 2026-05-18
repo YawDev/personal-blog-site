@@ -2,6 +2,7 @@ import { Blog } from "@/types/types";
 import BlogDetails from "@/components/blog/BlogDetails";
 import { Metadata } from "next";
 import { GetPostsById } from "@/service/PersonalBlogService";
+import { getInitialUser } from "@/utils/authUtil";
 
 export const metadata: Metadata = {
   title: "Post Details",
@@ -13,6 +14,8 @@ export default async function Page({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const user = await getInitialUser();
+  const isLoggedIn = !!user;
   const { id } = await params;
   let fetchedBlog: Blog | null = await GetPostsById(id);
   if (!fetchedBlog) {
@@ -20,7 +23,7 @@ export default async function Page({
   }
   return (
     <>
-      <BlogDetails fetchedBlog={fetchedBlog} />
+      <BlogDetails fetchedBlog={fetchedBlog} isLoggedIn={isLoggedIn} />
     </>
   );
 }

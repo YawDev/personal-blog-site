@@ -212,3 +212,49 @@ export const createPostApi = async (
     });
   return res;
 };
+
+export const editPostApi = async (
+  _userId: string,
+  data: Blog,
+): Promise<SavePostResponse> => {
+  let body: SavePostRequest & { postId: string } = {
+    title: data.title,
+    content: data.content,
+    preview: data.preview,
+    userId: data.userId,
+    postId: data.id,
+  };
+
+  var res = await axios
+    .put(`${getBffBaseUrl()}/api/blogs/edit`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Blog edited successfully: ", response.data);
+      return {
+        status: response.status,
+        message: "Blog edited successfully",
+      };
+    })
+    .catch((error) => {
+      const status = error.response?.status;
+      if (status && status >= 400 && status < 500) {
+        console.error("Not able to edit blog: ", error.response.data);
+        return {
+          status,
+          message:
+            error.response.data?.Message ??
+            error.response.data?.message ??
+            "Not able to edit blog.",
+        };
+      }
+
+      console.error("Error editing blog: ", error);
+      return {
+        status: status ?? 500,
+        message: "Error editing blog.",
+      };
+    });
+  return res;
+};

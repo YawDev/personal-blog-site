@@ -84,7 +84,7 @@ export function SavePostForm({
           formState={formState}
           handleInputChange={handleInputChange}
           handleBlur={handleBlur}
-          idParam={blogData?.id}
+          blogData={blogData ?? null}
         />
       </div>
     </section>

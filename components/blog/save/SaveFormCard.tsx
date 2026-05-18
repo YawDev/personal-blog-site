@@ -8,9 +8,9 @@ import { savePostToLocalStorage } from "@/utils/browser/InMemory";
 import { FormMode } from "@/utils/forms/FormHelpers";
 import { IPostFormState } from "@/formHelpers/formTypes";
 import { create } from "domain";
-import { createPostApi } from "@/service/PersonalBlogService";
+import { createPostApi, editPostApi } from "@/service/PersonalBlogService";
 import { useAuth } from "@/providers/auth-provider";
-import { Alert, SavePostResponse } from "@/types/types";
+import { Alert, Blog, SavePostResponse } from "@/types/types";
 import { useEffect, useState } from "react";
 import AlertMessage from "@/components/shared/AlertMessage";
 
@@ -19,14 +19,15 @@ const SaveFormCard = ({
   formState,
   handleInputChange,
   handleBlur,
-  idParam,
+  blogData,
 }: {
   mode: FormMode;
   formState: IPostFormState;
   handleInputChange: any;
   handleBlur: any;
-  idParam?: string;
+  blogData: Blog | null;
 }) => {
+  const postIdParam = blogData?.id;
   const router = useRouter();
   const { user } = useAuth();
   const [alert, setAlert] = useState<Alert>({
@@ -58,6 +59,19 @@ const SaveFormCard = ({
     return result;
   };
 
+  const handleEditPost = async (): Promise<SavePostResponse> => {
+    let result = await editPostApi(user?.id || "", {
+      title: formState.title.value,
+      content: formState.content.value,
+      preview: formState.preview.value,
+      id: postIdParam || "",
+      datePosted: blogData?.datePosted || "",
+      userId: blogData?.userId || "",
+    });
+
+    return result;
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
       <form
@@ -79,7 +93,20 @@ const SaveFormCard = ({
               });
             }
           }
-          //Do rest for editing (both draft and published)
+
+          if (mode === FormMode.EditPublished) {
+            let result = await handleEditPost();
+            if (result.status === 200) {
+              router.push(`/blogs/${postIdParam}`);
+            } else {
+              //handle error case, show alert or something
+              setAlert({
+                show: true,
+                message: result.message,
+                apiStatus: result.status,
+              });
+            }
+          }
         }}
       >
         <div className="max-w-md mx-auto">

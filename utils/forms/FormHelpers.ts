@@ -12,7 +12,7 @@ export const PostFormValidationResult = (
 };
 
 const getPostFieldError = (field: string, value: string): string => {
-  const alphaumericRegex = /^[a-zA-Z0-9\s.,!?':"()-]+$/;
+  const alphaumericRegex = /^[a-zA-Z0-9\s.,!?':"()\-—–…""'']+$/;
 
   switch (field) {
     case "title":
@@ -26,15 +26,13 @@ const getPostFieldError = (field: string, value: string): string => {
     case "preview":
       if (value && !alphaumericRegex.test(value))
         return "Only letters, numbers, and basic punctuation allowed";
-      if (value && value.length > 100)
-        return "Preview must be under 100 characters";
+      if (value && value.length > 500)
+        return "Preview must be under 500 characters";
 
       return "";
 
     case "content":
       if (!value) return "Content is required";
-      if (!alphaumericRegex.test(value))
-        return "Only letters, numbers, and basic punctuation allowed";
       if (value.length < 20) return "Content is too short";
       return "";
 
