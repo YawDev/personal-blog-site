@@ -54,6 +54,12 @@ const NavBar = () => {
                 >
                   Logout
                 </button>
+                <Link
+                  href="/identity/profile"
+                  className="inline-block rounded-lg bg-white px-4 py-2 font-semibold text-teal-700 transition-colors duration-200 hover:bg-teal-50"
+                >
+                  Profile
+                </Link>
               </>
             ) : (
               <>

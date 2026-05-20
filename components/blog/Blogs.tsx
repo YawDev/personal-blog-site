@@ -10,6 +10,10 @@ import {
   maxValueToDisplay,
   minValueToDisplay,
 } from "@/utils/pagination/VisiblePostSetttings";
+import {
+  USE_LOCAL_STORAGE_FALLBACK,
+  getBlogsFromStorage,
+} from "@/utils/browser/localStorageFallback";
 const BlogList = ({
   fetchedBlogs,
   currentUser,
@@ -23,12 +27,13 @@ const BlogList = ({
   const [showMyPostsOnly, setShowMyPostsOnly] = useState(false);
 
   useEffect(() => {
-    // Remove localStorage once API is integrated and replace with fetchedBlogs
-    // const storedBlogs =
-    //   fetchedBlogs?.length > 0 ? fetchedBlogs : getFromLocalStorage("blogs");
-
-    // const blogsData: Blog[] = storedBlogs ? JSON.parse(storedBlogs) : [];
-    setBlogs(Array.isArray(fetchedBlogs) ? fetchedBlogs : []);
+    // Use API results; fall back to localStorage only if the flag is on (dev-only).
+    const apiBlogs = Array.isArray(fetchedBlogs) ? fetchedBlogs : [];
+    const blogsData =
+      apiBlogs.length > 0 || !USE_LOCAL_STORAGE_FALLBACK
+        ? apiBlogs
+        : getBlogsFromStorage();
+    setBlogs(blogsData);
     setIsLoading(false);
   }, [fetchedBlogs]);
 

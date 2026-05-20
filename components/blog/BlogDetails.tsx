@@ -5,15 +5,16 @@ import CallToAction from "../home/CallToAction";
 import { useEffect, useState } from "react";
 import BackToArticles from "./BackToArticles";
 import EditPostLink from "./save/EditPostLink";
-import { getFromLocalStorage } from "@/utils/browser/LocalStorage";
 import Link from "next/dist/client/link";
 
 const BlogDetails = ({
   fetchedBlog,
   isLoggedIn,
+  isAuthor,
 }: {
   fetchedBlog: Blog | null;
   isLoggedIn: boolean;
+  isAuthor: boolean | null; // null means we don't know yet (e.g. still loading), true means user is author, false means user is not author
 }) => {
   const formatDate = (date: string | undefined) => {
     if (date) {
@@ -37,22 +38,17 @@ const BlogDetails = ({
   const estimatedReadTime = words > 0 ? Math.ceil(words / 200) : 0;
 
   useEffect(() => {
-    // Remove localStorage once API is integrated and replace with fetchedBlog
-    // var localStorage: any = getFromLocalStorage("blogs");
-    // console.log("Local Storage Blogs:", localStorage);
-    // var blogFromStorage: Blog | null = localStorage
-    //   ? JSON.parse(localStorage).find(
-    //       (b: { id: string }) => b.id === fetchedBlog?.id,
-    //     )
-    //   : null;
-
-    //Until we have an API, we'll check localStorage for the blog post details first, then fall back to the passed fetchedBlog (which is just a placeholder with the correct ID)
-    // Set state to the blog from localStorage if found, otherwise use the fetchedBlog (which is just a placeholder with the correct ID until we integrate the API)
     if (fetchedBlog) {
       setCurrentArticle(fetchedBlog);
     }
     setIsLoading(false);
   }, [fetchedBlog]);
+
+  useEffect(() => {
+    if (currentArticle?.title) {
+      document.title = `Personal Blog - ${currentArticle.title}`;
+    }
+  }, [currentArticle?.title]);
 
   if (isLoading) {
     return null; // Let the server loading handle this
@@ -65,7 +61,7 @@ const BlogDetails = ({
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <BackToArticles />
-            {isLoggedIn && <EditPostLink id={currentArticle?.id} />}
+            {isLoggedIn && isAuthor && <EditPostLink id={currentArticle?.id} />}
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
             {currentArticle?.title}

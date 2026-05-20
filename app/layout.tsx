@@ -6,7 +6,10 @@ import { AuthProvider } from "@/providers/auth-provider";
 import { getInitialUser } from "@/utils/authUtil";
 
 export const metadata: Metadata = {
-  title: "Personal Blog",
+  title: {
+    template: "Personal Blog - %s",
+    default: "Personal Blog",
+  },
   description: "Personal Blog Site",
 };
 
