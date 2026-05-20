@@ -1,7 +1,7 @@
 import { FormMode } from "@/utils/forms/FormHelpers";
 import { Blog } from "@/types/types";
 import { SavePostForm } from "@/components/blog/save/SavePostForm";
-import { GetPostsById } from "@/service/PersonalBlogService";
+import { fetchPostById } from "@/utils/serverApi";
 
 export default async function EditBlogPost({
   params,
@@ -9,7 +9,7 @@ export default async function EditBlogPost({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let blogToEdit: Blog | null = await GetPostsById(id);
+  let blogToEdit: Blog | null = await fetchPostById(id);
   if (!blogToEdit) {
     //If blog isnt found, redirect to not found
   }

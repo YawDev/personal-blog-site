@@ -1,11 +1,10 @@
 import BlogList from "@/components/blog/Blogs";
-import { Blog } from "../../types/types";
-import { GetAllPosts } from "@/service/PersonalBlogService";
+import { fetchAllPosts } from "@/utils/serverApi";
 import { getInitialUser } from "@/utils/authUtil";
 
 export default async function BlogsPage() {
   const [fetchedBlogs, user] = await Promise.all([
-    GetAllPosts(),
+    fetchAllPosts(),
     getInitialUser(),
   ]);
 
