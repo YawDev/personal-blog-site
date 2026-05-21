@@ -6,7 +6,11 @@ import { useEffect, useState } from "react";
 import BackToArticles from "./BackToArticles";
 import EditPostLink from "./save/EditPostLink";
 import Link from "next/dist/client/link";
-
+import DeletePostButton from "./DeletePostButton";
+import { useAuth } from "@/providers/auth-provider";
+import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
+import { deletePostApi } from "@/service/PersonalBlogService";
+import { useRouter } from "next/dist/client/components/navigation";
 const BlogDetails = ({
   fetchedBlog,
   isLoggedIn,
@@ -16,6 +20,20 @@ const BlogDetails = ({
   isLoggedIn: boolean;
   isAuthor: boolean | null; // null means we don't know yet (e.g. still loading), true means user is author, false means user is not author
 }) => {
+  const { user } = useAuth();
+  const router = useRouter();
+  const authorName: string =
+    isAuthor && user
+      ? user.displayName || user.userName || "Author"
+      : "Anonymous Author";
+  const authorAvatar = isAuthor ? user?.avatar : undefined;
+  const authorInitials = authorName
+    .split(" ")
+    .map((n) => n[0] ?? "")
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+
   const formatDate = (date: string | undefined) => {
     if (date) {
       return new Intl.DateTimeFormat("en-US", {
@@ -25,6 +43,8 @@ const BlogDetails = ({
       }).format(new Date(date));
     }
   };
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
 
   const [currentArticle, setCurrentArticle] = useState<Blog | null>(
@@ -54,6 +74,21 @@ const BlogDetails = ({
     return null; // Let the server loading handle this
   }
 
+  const handleDelete = async () => {
+    setIsDeleteModalOpen(false);
+    // The actual delete logic will be handled in the DeletePostButton component
+    const response = await deletePostApi(
+      currentArticle?.id ?? "",
+      currentArticle?.userId ?? "",
+    );
+    if (response) {
+      alert("Post deleted successfully.");
+      router.push("/blogs"); // Redirect to homepage or posts list
+    } else {
+      alert("Failed to delete the post. Please try again.");
+    }
+  };
+
   return (
     <article className="bg-white">
       {/* Hero Section */}
@@ -67,6 +102,39 @@ const BlogDetails = ({
             {currentArticle?.title}
           </h1>
 
+          <div className="flex items-center justify-between gap-3 mb-6">
+            <div className="flex items-center gap-3">
+              {authorAvatar ? (
+                <img
+                  src={authorAvatar}
+                  alt={authorName}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">
+                    {authorInitials}
+                  </span>
+                </div>
+              )}
+              <span className="text-gray-900 font-medium">{authorName}</span>
+            </div>
+            {isLoggedIn && isAuthor && (
+              <>
+                <DeletePostButton
+                  postId={currentArticle?.id ?? ""}
+                  userId={currentArticle?.userId ?? ""}
+                  handleDeleteClick={() => setIsDeleteModalOpen(true)}
+                />
+              </>
+            )}
+          </div>
+          <ConfirmDeleteModal
+            isOpen={isDeleteModalOpen}
+            setIsOpen={setIsDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirm={handleDelete}
+          />
           <div className="flex flex-wrap items-center gap-6 text-gray-600">
             <div className="flex items-center">
               <svg

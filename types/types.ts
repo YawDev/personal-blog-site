@@ -56,6 +56,11 @@ export type SavePostRequest = {
   userId: string | null;
 };
 
+export type DeletePostRequest = {
+  postId: string;
+  userId: string | null;
+};
+
 // Pagination
 export type IPagination = {
   itemsPerPage: number;
