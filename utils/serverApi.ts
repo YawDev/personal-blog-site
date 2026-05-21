@@ -33,3 +33,19 @@ export async function fetchPostById(id: string): Promise<Blog | null> {
     return null;
   }
 }
+
+export async function DeletePost(
+  postId: string,
+  userId: string | null,
+): Promise<boolean> {
+  try {
+    const response = await createHttpClient().delete(
+      `/blogs/${postId}/users/${userId}/delete`,
+    );
+    console.log("Blog deleted successfully");
+    return response.data.isDeleted === true;
+  } catch (error) {
+    logUpstreamError("SERVER DeletePost ERROR", error);
+    return false;
+  }
+}

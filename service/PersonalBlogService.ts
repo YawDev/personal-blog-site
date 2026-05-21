@@ -258,3 +258,23 @@ export const editPostApi = async (
     });
   return res;
 };
+
+export const deletePostApi = async (
+  postId: string,
+  userId: string | null,
+): Promise<boolean> => {
+  return await axios
+    .delete(`${getBffBaseUrl()}/api/blogs/delete`, {
+      data: { postId, userId },
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Blog deleted successfully: ", response.data);
+      return response.data?.status === 200;
+    })
+    .catch((error) => {
+      console.error("Not able to delete blog: ", error.response?.data);
+      return false;
+    });
+};
