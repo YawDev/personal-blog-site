@@ -4,7 +4,7 @@ import { InputFormField } from "../blog/save/InputFormField";
 import useEditProfileForm from "@/hooks/useProfileEditForm";
 import Link from "next/link";
 import { EditProfileApi } from "@/service/PersonalBlogService";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AlertMessage from "../shared/AlertMessage";
 
@@ -13,13 +13,13 @@ export default function EditProfileForm({
 }: {
   currentUser: User;
 }) {
+  const router = useRouter();
   const { formState, handleInputChange, handleBlur } = useEditProfileForm({
     userName: currentUser.userName,
     email: currentUser.email,
     firstName: "",
     lastName: "",
   });
-  const router = useRouter();
   const [alert, setAlert] = useState<Alert>({
     show: false,
     message: "",
@@ -93,8 +93,10 @@ export default function EditProfileForm({
               onSubmit={async (e) => {
                 e.preventDefault();
                 if (formState.validForSubmit) {
-                  let result: EditProfileResponse =
-                    await EditProfileApi(formState);
+                  let result: EditProfileResponse = await EditProfileApi(
+                    currentUser.id,
+                    formState,
+                  );
                   if (result.status === 200 || result.status === 201) {
                     router.push("/identity/profile?editSuccess=true");
                   } else {
