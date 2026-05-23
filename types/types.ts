@@ -56,6 +56,13 @@ export type SavePostRequest = {
   userId: string | null;
 };
 
+export type EditProfileRequest = {
+  FirstName: string;
+  LastName: string;
+  UserName: string;
+  Email: string;
+};
+
 export type DeletePostRequest = {
   postId: string;
   userId: string | null;
@@ -79,8 +86,12 @@ export type SignUpResponse = {
   status: number;
   message: string;
 };
-
 export type SavePostResponse = {
+  status: number;
+  message: string;
+};
+
+export type EditProfileResponse = {
   status: number;
   message: string;
 };

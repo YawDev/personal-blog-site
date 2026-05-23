@@ -53,6 +53,14 @@ export interface ISignUpFormState {
   validForSubmit: boolean;
 }
 
+export interface IEditProfileFormState {
+  userName: FormField;
+  firstName: FormField;
+  lastName: FormField;
+  email: FormField;
+  validForSubmit: boolean;
+}
+
 export type FormField = {
   value: string;
   error: string;

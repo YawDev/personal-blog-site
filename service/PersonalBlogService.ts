@@ -1,6 +1,11 @@
-import { ISignUpFormState } from "@/formHelpers/formTypes";
+import {
+  IEditProfileFormState,
+  ISignUpFormState,
+} from "@/formHelpers/formTypes";
 import {
   Blog,
+  EditProfileRequest,
+  EditProfileResponse,
   LoginRequest,
   LoginResponse,
   SavePostRequest,
@@ -146,6 +151,46 @@ export const SignUpApi = async (
       return {
         status: error.response?.status ?? 500,
         message: "Error signing up user.",
+      };
+    });
+  return user;
+};
+
+export const EditProfileApi = async (
+  data: IEditProfileFormState,
+): Promise<EditProfileResponse> => {
+  let body: EditProfileRequest = {
+    UserName: data.userName.value,
+    Email: data.email.value,
+    FirstName: data.firstName.value,
+    LastName: data.lastName.value,
+  };
+
+  var user = await axios
+    .post(`${getBffBaseUrl()}/api/auth/account/edit`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Account successfully edited!");
+      return {
+        status: response.status,
+        message: "Account successfully edited!",
+      };
+    })
+    .catch((error) => {
+      if (error.response?.status === 400) {
+        console.error("Registration failed: ", error.response.data);
+        return {
+          status: error.response.status,
+          message: error.response.data?.message ?? "Account Edit failed",
+        };
+      }
+
+      console.error("Error editing account: ", error);
+      return {
+        status: error.response?.status ?? 500,
+        message: "Error editing account.",
       };
     });
   return user;
