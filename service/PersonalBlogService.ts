@@ -157,6 +157,7 @@ export const SignUpApi = async (
 };
 
 export const EditProfileApi = async (
+  userId: string,
   data: IEditProfileFormState,
 ): Promise<EditProfileResponse> => {
   let body: EditProfileRequest = {
@@ -167,7 +168,7 @@ export const EditProfileApi = async (
   };
 
   var user = await axios
-    .post(`${getBffBaseUrl()}/api/auth/account/edit`, body, {
+    .put(`${getBffBaseUrl()}/api/auth/account/edit?id=${userId}`, body, {
       timeout: 5000,
       withCredentials: true,
     })
@@ -180,7 +181,7 @@ export const EditProfileApi = async (
     })
     .catch((error) => {
       if (error.response?.status === 400) {
-        console.error("Registration failed: ", error.response.data);
+        console.error("Account edit failed: ", error.response.data);
         return {
           status: error.response.status,
           message: error.response.data?.message ?? "Account Edit failed",

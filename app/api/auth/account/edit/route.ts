@@ -2,13 +2,33 @@ import { createHttpClient } from "@/utils/httpClientUtil";
 import axios from "axios";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function PUT(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { status: 400, data: null, message: "Missing user id" },
+        { status: 400 },
+      );
+    }
+
     const body = await request.json();
     const httpClient = createHttpClient();
 
-    const response = await httpClient.post("/api/account/edit", body, {
-      headers: { "Content-Type": "application/json" },
+    const cookieHeader = request.headers.get("cookie") ?? "";
+    const accessToken = cookieHeader
+      .split(";")
+      .map((c) => c.trim())
+      .find((c) => c.startsWith("access_token="))
+      ?.slice("access_token=".length);
+
+    const response = await httpClient.put(`/api/account/edit/${id}`, body, {
+      headers: {
+        "Content-Type": "application/json",
+        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+      },
     });
 
     console.log("Backend response status:", response.status);
