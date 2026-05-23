@@ -1,5 +1,12 @@
 import { Dispatch, SetStateAction } from "react";
 
+// General Types
+export type Alert = {
+  show: boolean;
+  message: string;
+  apiStatus: number;
+};
+
 // Domain Entities
 export interface IPost {
   id: string;
@@ -42,6 +49,25 @@ export type SignUpRequest = {
   email: string;
 };
 
+export type SavePostRequest = {
+  title: string;
+  content: string;
+  preview: string;
+  userId: string | null;
+};
+
+export type EditProfileRequest = {
+  FirstName: string;
+  LastName: string;
+  UserName: string;
+  Email: string;
+};
+
+export type DeletePostRequest = {
+  postId: string;
+  userId: string | null;
+};
+
 // Pagination
 export type IPagination = {
   itemsPerPage: number;
@@ -49,10 +75,24 @@ export type IPagination = {
   currentPage: number;
 };
 
-// API Error Response
+// BFF API Response
 export type LoginResponse = {
   status: number;
-  data: User | any;
+  data: User | null;
+  message: string;
+};
+
+export type SignUpResponse = {
+  status: number;
+  message: string;
+};
+export type SavePostResponse = {
+  status: number;
+  message: string;
+};
+
+export type EditProfileResponse = {
+  status: number;
   message: string;
 };
 
@@ -60,7 +100,8 @@ export type LoginResponse = {
 export interface IUserContext {
   user: User | null;
   isLoggedIn: boolean;
-  setUser: (value: User) => void;
+  isLoading: boolean;
+  setUser: (value: User | null) => void;
 }
 
 // BFF types

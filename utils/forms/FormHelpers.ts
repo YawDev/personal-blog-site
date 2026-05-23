@@ -12,7 +12,7 @@ export const PostFormValidationResult = (
 };
 
 const getPostFieldError = (field: string, value: string): string => {
-  const alphaumericRegex = /^[a-zA-Z0-9\s.,!?':"()-]+$/;
+  const alphaumericRegex = /^[a-zA-Z0-9\s.,!?':"()\-—–…""'']+$/;
 
   switch (field) {
     case "title":
@@ -26,15 +26,13 @@ const getPostFieldError = (field: string, value: string): string => {
     case "preview":
       if (value && !alphaumericRegex.test(value))
         return "Only letters, numbers, and basic punctuation allowed";
-      if (value && value.length > 100)
-        return "Preview must be under 100 characters";
+      if (value && value.length > 500)
+        return "Preview must be under 500 characters";
 
       return "";
 
     case "content":
       if (!value) return "Content is required";
-      if (!alphaumericRegex.test(value))
-        return "Only letters, numbers, and basic punctuation allowed";
       if (value.length < 20) return "Content is too short";
       return "";
 
@@ -44,7 +42,45 @@ const getPostFieldError = (field: string, value: string): string => {
 };
 
 export const LoginFormValidationResult = (field: string, value: string) => {
-  return getCommonAuthFieldError(field, value);
+  if (field === "userName" && !value) return "Username is required";
+  if (field === "password" && !value) return "Password is required";
+};
+
+export const EditProfileValidationResult = (field: string, value: string) => {
+  // Alphanumeric + underscore only, 3–20 chars
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+  const nameRegex = /^[a-zA-ZÀ-ÖØ-öø-ÿ'\- ]{1,50}$/;
+
+  // Standard email format
+  const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+
+  switch (field) {
+    case "userName":
+      if (!value) return "Username is required";
+      if (!usernameRegex.test(value))
+        return "Username must be 3–20 characters: letters, numbers, or underscores only";
+      return "";
+
+    case "firstName":
+      if (!value) return "First name is required";
+      if (!nameRegex.test(value))
+        return "First name may only contain letters, hyphens, or apostrophes";
+      return "";
+
+    case "lastName":
+      if (!value) return "Last name is required";
+      if (!nameRegex.test(value))
+        return "Last name may only contain letters, hyphens, or apostrophes";
+      return "";
+
+    case "email":
+      if (!value) return "Email is required";
+      if (!emailRegex.test(value)) return "Enter a valid email address";
+      return "";
+
+    default:
+      return "";
+  }
 };
 
 export const SignUpFormValidationResult = (field: string, value: string) => {
@@ -97,8 +133,8 @@ const getCommonAuthFieldError = (field: string, value: string): string => {
 
     case "password":
       if (!value) return "Password is required";
-      // if (!passwordRegex.test(value))
-      //   return "Password must be at least 8 characters and include an uppercase letter, lowercase letter, number, and special character";
+      if (!passwordRegex.test(value))
+        return "Password must be at least 8 characters and include an uppercase letter, lowercase letter, number, and special character";
       return "";
 
     case "confirmPassword":

@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     console.log("Backend response status:", response.status);
     console.log("Backend response data:", response.data);
 
-    return NextResponse.json(
+    const res = NextResponse.json(
       {
         status: 200,
         data: null,
@@ -19,6 +19,10 @@ export async function POST(request: Request) {
       },
       { status: 200 },
     );
+
+    res.cookies.delete("access_token");
+
+    return res;
   } catch (error) {
     console.error("=== LOGOUT API ROUTE ERROR ===");
     console.error("Error details:", error);

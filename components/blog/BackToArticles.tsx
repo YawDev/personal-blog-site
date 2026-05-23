@@ -1,9 +1,10 @@
+import Link from "next/dist/client/link";
 import React from "react";
 
 const BackToArticles = () => {
   return (
     <div className="mb-4">
-      <a
+      <Link
         href="/blogs"
         className="inline-flex items-center text-teal-600 hover:text-teal-800 font-medium transition-colors duration-200"
       >
@@ -21,7 +22,7 @@ const BackToArticles = () => {
           />
         </svg>
         Back to Articles
-      </a>
+      </Link>
     </div>
   );
 };

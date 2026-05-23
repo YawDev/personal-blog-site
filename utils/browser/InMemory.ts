@@ -1,5 +1,5 @@
 import { FormMode } from "../forms/FormHelpers";
-import { Blog } from "../types";
+import { Blog } from "../../types/types";
 import { getFromLocalStorage, saveToLocalStorage } from "./LocalStorage";
 import { v4 as uuid } from "uuid";
 

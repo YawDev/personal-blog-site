@@ -1,4 +1,4 @@
-import { Blog, User } from "../types";
+import { Blog, User } from "../../types/types";
 
 export const normalizePosts = (payload: any): Blog[] => {
   const data = payload?.blogs || [];

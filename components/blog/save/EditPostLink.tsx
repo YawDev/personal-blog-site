@@ -1,9 +1,10 @@
+import Link from "next/dist/client/link";
 import React from "react";
 
 const EditPostLink = ({ id }: { id: string | undefined }) => {
   return (
     <div className="mb-4">
-      <a
+      <Link
         href={`/blogs/edit/${id}`}
         className="inline-flex items-center text-teal-600 hover:text-teal-800 font-medium transition-colors duration-200"
       >
@@ -21,7 +22,7 @@ const EditPostLink = ({ id }: { id: string | undefined }) => {
           />
         </svg>
         Edit Post
-      </a>
+      </Link>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { IPagination } from "@/utils/types";
+import { IPagination } from "@/types/types";
 import { minValueToDisplay } from "@/utils/pagination/VisiblePostSetttings";
 
 export function PageArrow({

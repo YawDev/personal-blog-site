@@ -1,10 +1,18 @@
-import { ISignUpFormState } from "@/formHelpers/formTypes";
+import {
+  IEditProfileFormState,
+  ISignUpFormState,
+} from "@/formHelpers/formTypes";
 import {
   Blog,
+  EditProfileRequest,
+  EditProfileResponse,
   LoginRequest,
   LoginResponse,
+  SavePostRequest,
+  SavePostResponse,
   SignUpRequest,
-} from "@/utils/types";
+  SignUpResponse,
+} from "@/types/types";
 import axios from "axios";
 import { createHttpClient } from "@/utils/httpClientUtil";
 
@@ -63,8 +71,11 @@ export const GetPostsById = async (id: string): Promise<Blog | null> => {
 };
 
 export const LoginApi = async (body: LoginRequest): Promise<LoginResponse> => {
-  var res = await httpClient
-    .post(`${getBffBaseUrl()}/api/auth/login`, body)
+  var res = await axios
+    .post(`${getBffBaseUrl()}/api/auth/login`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
     .then((response) => {
       console.log("response", response);
       console.log("User authenticated: ", response.data);
@@ -77,7 +88,7 @@ export const LoginApi = async (body: LoginRequest): Promise<LoginResponse> => {
       } else {
         return {
           status: response.status,
-          data: {}, //normalizeUser(response.data),
+          data: response.data, //normalizeUser(response.data),
           message: "Login successful",
         };
       }
@@ -103,7 +114,9 @@ export const LoginApi = async (body: LoginRequest): Promise<LoginResponse> => {
   return res;
 };
 
-export const SignUpApi = async (data: ISignUpFormState): Promise<boolean> => {
+export const SignUpApi = async (
+  data: ISignUpFormState,
+): Promise<SignUpResponse> => {
   let body: SignUpRequest = {
     userName: data.userName.value,
     password: data.password.value,
@@ -120,11 +133,65 @@ export const SignUpApi = async (data: ISignUpFormState): Promise<boolean> => {
     })
     .then((response) => {
       console.log("Account successfully registered!");
-      return true;
+      return {
+        status: response.status,
+        message: "Account successfully registered!",
+      };
     })
     .catch((error) => {
+      if (error.response?.status === 400) {
+        console.error("Registration failed: ", error.response.data);
+        return {
+          status: error.response.status,
+          message: error.response.data?.message ?? "Registration failed",
+        };
+      }
+
       console.error("Error signing up user: ", error);
-      return false;
+      return {
+        status: error.response?.status ?? 500,
+        message: "Error signing up user.",
+      };
+    });
+  return user;
+};
+
+export const EditProfileApi = async (
+  data: IEditProfileFormState,
+): Promise<EditProfileResponse> => {
+  let body: EditProfileRequest = {
+    UserName: data.userName.value,
+    Email: data.email.value,
+    FirstName: data.firstName.value,
+    LastName: data.lastName.value,
+  };
+
+  var user = await axios
+    .post(`${getBffBaseUrl()}/api/auth/account/edit`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Account successfully edited!");
+      return {
+        status: response.status,
+        message: "Account successfully edited!",
+      };
+    })
+    .catch((error) => {
+      if (error.response?.status === 400) {
+        console.error("Registration failed: ", error.response.data);
+        return {
+          status: error.response.status,
+          message: error.response.data?.message ?? "Account Edit failed",
+        };
+      }
+
+      console.error("Error editing account: ", error);
+      return {
+        status: error.response?.status ?? 500,
+        message: "Error editing account.",
+      };
     });
   return user;
 };
@@ -144,4 +211,115 @@ export const logoutApi = async (): Promise<boolean> => {
       return false;
     });
   return user;
+};
+
+export const createPostApi = async (
+  id: string,
+  data: Blog,
+): Promise<SavePostResponse> => {
+  let body: SavePostRequest = {
+    title: data.title,
+    content: data.content,
+    preview: data.preview,
+    userId: data.userId,
+  };
+
+  var res = await axios
+    .post(`${getBffBaseUrl()}/api/blogs/create`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Blog created successfully: ", response.data);
+      return {
+        status: response.status,
+        message: "Blog created successfully",
+      };
+    })
+    .catch((error) => {
+      const status = error.response?.status;
+      if (status && status >= 400 && status < 500) {
+        console.error("Not able to create blog: ", error.response.data);
+        return {
+          status,
+          message:
+            error.response.data?.Message ??
+            error.response.data?.message ??
+            "Not able to create blog.",
+        };
+      }
+
+      console.error("Error creating blog: ", error);
+      return {
+        status: status ?? 500,
+        message: "Error creating blog.",
+      };
+    });
+  return res;
+};
+
+export const editPostApi = async (
+  _userId: string,
+  data: Blog,
+): Promise<SavePostResponse> => {
+  let body: SavePostRequest & { postId: string } = {
+    title: data.title,
+    content: data.content,
+    preview: data.preview,
+    userId: data.userId,
+    postId: data.id,
+  };
+
+  var res = await axios
+    .put(`${getBffBaseUrl()}/api/blogs/edit`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Blog edited successfully: ", response.data);
+      return {
+        status: response.status,
+        message: "Blog edited successfully",
+      };
+    })
+    .catch((error) => {
+      const status = error.response?.status;
+      if (status && status >= 400 && status < 500) {
+        console.error("Not able to edit blog: ", error.response.data);
+        return {
+          status,
+          message:
+            error.response.data?.Message ??
+            error.response.data?.message ??
+            "Not able to edit blog.",
+        };
+      }
+
+      console.error("Error editing blog: ", error);
+      return {
+        status: status ?? 500,
+        message: "Error editing blog.",
+      };
+    });
+  return res;
+};
+
+export const deletePostApi = async (
+  postId: string,
+  userId: string | null,
+): Promise<boolean> => {
+  return await axios
+    .delete(`${getBffBaseUrl()}/api/blogs/delete`, {
+      data: { postId, userId },
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Blog deleted successfully: ", response.data);
+      return response.data?.status === 200;
+    })
+    .catch((error) => {
+      console.error("Not able to delete blog: ", error.response?.data);
+      return false;
+    });
 };

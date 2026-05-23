@@ -1,4 +1,4 @@
-import { IPagination } from "@/utils/types";
+import { IPagination } from "@/types/types";
 import { PageArrow } from "./PageArrow";
 
 const Pagination = ({

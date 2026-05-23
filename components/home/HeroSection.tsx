@@ -1,5 +1,6 @@
 import React from "react";
 import CallToAction from "./CallToAction";
+import Link from "next/dist/client/link";
 
 const HeroSection = () => {
   return (
@@ -13,18 +14,18 @@ const HeroSection = () => {
           growth through thoughtful analysis and practical insights.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <a
+          <Link
             href="/blogs"
             className="bg-teal-600 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-teal-700 transition-colors duration-300 shadow-lg hover:shadow-xl"
           >
             Read Latest Articles
-          </a>
-          <a
+          </Link>
+          <Link
             href="#featured"
             className="border-2 border-teal-600 text-teal-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-teal-600 hover:text-white transition-colors duration-300"
           >
             Featured Content
-          </a>
+          </Link>
         </div>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div className="p-6">

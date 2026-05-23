@@ -1,7 +1,15 @@
-import { Blog } from "@/utils/types";
-import { Dispatch, SetStateAction } from "react";
+import { Blog, User } from "@/types/types";
+import Link from "next/link";
 
-const BlogItem = ({ blog }: { blog: Blog }) => {
+const BlogItem = ({
+  blog,
+  currentUser,
+}: {
+  blog: Blog;
+  currentUser: User | null;
+}) => {
+  const user = currentUser;
+
   return (
     // <article className="container mx-auto px-4 max-w-4xl">
     //   {/* Your blog post content goes here */}
@@ -17,12 +25,18 @@ const BlogItem = ({ blog }: { blog: Blog }) => {
             {blog.preview ||
               "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."}
           </p>
-          <a
+          <p className="text-xs font-medium text-teal-600 mt-3">
+            By{" "}
+            <span className="font-semibold">
+              {blog.userId === user?.id ? user.userName : "Anonymous Author"}
+            </span>
+          </p>
+          <Link
             href={`/blogs/${blog.id}`}
             className="text-blue-600 hover:text-blue-800 mt-4 inline-block font-semibold transition-colors cursor-pointer"
           >
             Read More →
-          </a>
+          </Link>
         </div>
       </div>
     </div>

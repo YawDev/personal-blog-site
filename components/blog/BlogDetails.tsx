@@ -1,13 +1,39 @@
 "use client";
 
-import { Blog } from "@/utils/types";
+import { Blog } from "@/types/types";
 import CallToAction from "../home/CallToAction";
 import { useEffect, useState } from "react";
 import BackToArticles from "./BackToArticles";
 import EditPostLink from "./save/EditPostLink";
-import { getFromLocalStorage } from "@/utils/browser/LocalStorage";
+import Link from "next/dist/client/link";
+import DeletePostButton from "./DeletePostButton";
+import { useAuth } from "@/providers/auth-provider";
+import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
+import { deletePostApi } from "@/service/PersonalBlogService";
+import { useRouter } from "next/dist/client/components/navigation";
+const BlogDetails = ({
+  fetchedBlog,
+  isLoggedIn,
+  isAuthor,
+}: {
+  fetchedBlog: Blog | null;
+  isLoggedIn: boolean;
+  isAuthor: boolean | null; // null means we don't know yet (e.g. still loading), true means user is author, false means user is not author
+}) => {
+  const { user } = useAuth();
+  const router = useRouter();
+  const authorName: string =
+    isAuthor && user
+      ? user.displayName || user.userName || "Author"
+      : "Anonymous Author";
+  const authorAvatar = isAuthor ? user?.avatar : undefined;
+  const authorInitials = authorName
+    .split(" ")
+    .map((n) => n[0] ?? "")
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
-const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog | null }) => {
   const formatDate = (date: string | undefined) => {
     if (date) {
       return new Intl.DateTimeFormat("en-US", {
@@ -17,6 +43,8 @@ const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog | null }) => {
       }).format(new Date(date));
     }
   };
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
   const [isLoading, setIsLoading] = useState(true);
 
   const [currentArticle, setCurrentArticle] = useState<Blog | null>(
@@ -30,26 +58,36 @@ const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog | null }) => {
   const estimatedReadTime = words > 0 ? Math.ceil(words / 200) : 0;
 
   useEffect(() => {
-    // Remove localStorage once API is integrated and replace with fetchedBlog
-    // var localStorage: any = getFromLocalStorage("blogs");
-    // console.log("Local Storage Blogs:", localStorage);
-    // var blogFromStorage: Blog | null = localStorage
-    //   ? JSON.parse(localStorage).find(
-    //       (b: { id: string }) => b.id === fetchedBlog?.id,
-    //     )
-    //   : null;
-
-    //Until we have an API, we'll check localStorage for the blog post details first, then fall back to the passed fetchedBlog (which is just a placeholder with the correct ID)
-    // Set state to the blog from localStorage if found, otherwise use the fetchedBlog (which is just a placeholder with the correct ID until we integrate the API)
     if (fetchedBlog) {
       setCurrentArticle(fetchedBlog);
     }
     setIsLoading(false);
   }, [fetchedBlog]);
 
+  useEffect(() => {
+    if (currentArticle?.title) {
+      document.title = `Personal Blog - ${currentArticle.title}`;
+    }
+  }, [currentArticle?.title]);
+
   if (isLoading) {
     return null; // Let the server loading handle this
   }
+
+  const handleDelete = async () => {
+    setIsDeleteModalOpen(false);
+    // The actual delete logic will be handled in the DeletePostButton component
+    const response = await deletePostApi(
+      currentArticle?.id ?? "",
+      currentArticle?.userId ?? "",
+    );
+    if (response) {
+      alert("Post deleted successfully.");
+      router.push("/blogs"); // Redirect to homepage or posts list
+    } else {
+      alert("Failed to delete the post. Please try again.");
+    }
+  };
 
   return (
     <article className="bg-white">
@@ -58,12 +96,45 @@ const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog | null }) => {
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <BackToArticles />
-            <EditPostLink id={currentArticle?.id} />
+            {isLoggedIn && isAuthor && <EditPostLink id={currentArticle?.id} />}
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
             {currentArticle?.title}
           </h1>
 
+          <div className="flex items-center justify-between gap-3 mb-6">
+            <div className="flex items-center gap-3">
+              {authorAvatar ? (
+                <img
+                  src={authorAvatar}
+                  alt={authorName}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-teal-600 flex items-center justify-center">
+                  <span className="text-white font-semibold text-sm">
+                    {authorInitials}
+                  </span>
+                </div>
+              )}
+              <span className="text-gray-900 font-medium">{authorName}</span>
+            </div>
+            {isLoggedIn && isAuthor && (
+              <>
+                <DeletePostButton
+                  postId={currentArticle?.id ?? ""}
+                  userId={currentArticle?.userId ?? ""}
+                  handleDeleteClick={() => setIsDeleteModalOpen(true)}
+                />
+              </>
+            )}
+          </div>
+          <ConfirmDeleteModal
+            isOpen={isDeleteModalOpen}
+            setIsOpen={setIsDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            onConfirm={handleDelete}
+          />
           <div className="flex flex-wrap items-center gap-6 text-gray-600">
             <div className="flex items-center">
               <svg
@@ -180,21 +251,21 @@ const BlogDetails = ({ fetchedBlog }: { fetchedBlog: Blog | null }) => {
             <div className="flex justify-between">
               <div className="flex-1 pr-4">
                 <p className="text-sm text-gray-500 mb-1">Previous Article</p>
-                <a
+                <Link
                   href="#"
                   className="text-teal-600 hover:text-teal-800 font-medium"
                 >
                   ← Exploring Modern Web Development
-                </a>
+                </Link>
               </div>
               <div className="flex-1 pl-4 text-right">
                 <p className="text-sm text-gray-500 mb-1">Next Article</p>
-                <a
+                <Link
                   href="#"
                   className="text-teal-600 hover:text-teal-800 font-medium"
                 >
                   The Future of AI in Business →
-                </a>
+                </Link>
               </div>
             </div>
           </nav>

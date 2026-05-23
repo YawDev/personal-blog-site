@@ -2,12 +2,16 @@
 
 import { FormMode } from "@/utils/forms/FormHelpers";
 import useFormValidation from "@/hooks/usePostForm";
-import { Blog } from "@/utils/types";
+import { Blog } from "@/types/types";
 import { useEffect, useState } from "react";
 import setPageTitle from "@/formHelpers/formUtils";
 import BackToArticles from "../BackToArticles";
 import SaveFormCard from "./SaveFormCard";
-import { getFromLocalStorage } from "@/utils/browser/LocalStorage";
+import {
+  USE_LOCAL_STORAGE_FALLBACK,
+  getBlogByIdFromStorage,
+  getDraftByIdFromStorage,
+} from "@/utils/browser/localStorageFallback";
 import usePostForm from "@/hooks/usePostForm";
 export function SavePostForm({
   mode,
@@ -29,24 +33,19 @@ export function SavePostForm({
 
   useEffect(() => {
     if (mode === FormMode.EditPublished) {
-      // Remove localStorage once API is integrated and replace with fetchedBlog
-      var localStorage: any = getFromLocalStorage("blogs");
-      console.log("Local Storage Blogs:", localStorage);
-      const blogToEdit = localStorage
-        ? JSON.parse(localStorage).find(
-            (b: { id: string }) => b.id === blogData?.id,
-          )
-        : null;
+      // API provides blogData; fall back to localStorage only if the flag is on (dev-only).
+      let blogToEdit = blogData;
+      if (!blogToEdit && USE_LOCAL_STORAGE_FALLBACK && blogData?.id) {
+        blogToEdit = getBlogByIdFromStorage(blogData.id);
+      }
       if (blogToEdit) {
         setCurrentBlogData(blogToEdit);
         loadExistingData(blogToEdit);
       }
     } else if (mode === FormMode.EditDraft) {
-      var localStorage: any = getFromLocalStorage("drafts");
-      const draftToEdit = localStorage
-        ? JSON.parse(localStorage).find(
-            (d: { id: string }) => d.id === blogData?.id,
-          )
+      // Drafts still live in localStorage until a backend endpoint exists.
+      const draftToEdit = blogData?.id
+        ? getDraftByIdFromStorage(blogData.id)
         : null;
       if (draftToEdit) {
         setCurrentBlogData(draftToEdit);
@@ -83,7 +82,7 @@ export function SavePostForm({
           formState={formState}
           handleInputChange={handleInputChange}
           handleBlur={handleBlur}
-          idParam={blogData?.id}
+          blogData={blogData ?? null}
         />
       </div>
     </section>

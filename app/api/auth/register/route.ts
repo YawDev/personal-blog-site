@@ -14,6 +14,17 @@ export async function POST(request: Request) {
     console.log("Backend response status:", response.status);
     console.log("Backend response data:", response.data);
 
+    if (response.status !== 200 && response.status !== 201) {
+      return NextResponse.json(
+        {
+          status: response.status,
+          data: null,
+          message: response.data?.message ?? "Registration failed",
+        },
+        { status: response.status },
+      );
+    }
+
     return NextResponse.json(
       {
         status: 200,
@@ -34,7 +45,8 @@ export async function POST(request: Request) {
         {
           status,
           data: null,
-          message: errorData?.message ?? "Registration failed",
+          message:
+            errorData?.Message ?? errorData?.message ?? "Registration failed",
         },
         { status },
       );
