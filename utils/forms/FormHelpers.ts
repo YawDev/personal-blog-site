@@ -46,6 +46,43 @@ export const LoginFormValidationResult = (field: string, value: string) => {
   if (field === "password" && !value) return "Password is required";
 };
 
+export const EditProfileValidationResult = (field: string, value: string) => {
+  // Alphanumeric + underscore only, 3–20 chars
+  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+  const nameRegex = /^[a-zA-ZÀ-ÖØ-öø-ÿ'\- ]{1,50}$/;
+
+  // Standard email format
+  const emailRegex = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+
+  switch (field) {
+    case "userName":
+      if (!value) return "Username is required";
+      if (!usernameRegex.test(value))
+        return "Username must be 3–20 characters: letters, numbers, or underscores only";
+      return "";
+
+    case "firstName":
+      if (!value) return "First name is required";
+      if (!nameRegex.test(value))
+        return "First name may only contain letters, hyphens, or apostrophes";
+      return "";
+
+    case "lastName":
+      if (!value) return "Last name is required";
+      if (!nameRegex.test(value))
+        return "Last name may only contain letters, hyphens, or apostrophes";
+      return "";
+
+    case "email":
+      if (!value) return "Email is required";
+      if (!emailRegex.test(value)) return "Enter a valid email address";
+      return "";
+
+    default:
+      return "";
+  }
+};
+
 export const SignUpFormValidationResult = (field: string, value: string) => {
   return getSignUpFieldError(field, value);
 };
