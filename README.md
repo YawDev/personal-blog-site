@@ -319,6 +319,53 @@ const { formState, handleInputChange, handleBlur } = useLoginForm({
 
 ---
 
+## Environment Variables
+
+### Local setup
+
+1. Create a `.env.local` file in the project root (next to `package.json`):
+
+```bash
+cp .env.example .env.local
+```
+
+2. Fill in your values:
+
+```env
+# .env.local
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+`.env.local` is already covered by the `.gitignore` pattern `.env*`, so it will never be committed.
+
+### Available variables
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `NEXT_PUBLIC_APP_URL` | No | `http://localhost:3000` | Full origin used for server-side BFF calls. Must match the host the app is served from so Next.js route handlers resolve correctly during SSR. |
+
+### Template file
+
+An `.env.example` file is committed to the repo with all keys present but no real values. Keep it in sync whenever a new variable is added.
+
+```env
+# .env.example — commit this, never .env.local
+NEXT_PUBLIC_APP_URL=
+```
+
+### Staging and production
+
+Environment variables for non-local environments are **not stored in files**. They are injected by the hosting platform at deploy time:
+
+| Platform | Where to set |
+|---|---|
+| **Vercel** | Project → Settings → Environment Variables. Scope each value to the target environment (Preview = staging, Production = prod). |
+| **Other hosts** | Set via the platform's secrets/config UI, or pass as shell env vars in the deploy command. |
+
+Never commit `.env.staging`, `.env.production`, or any file that contains real credentials. The `.gitignore` blocks all `.env*` files except `.env.example`, which must not contain real values.
+
+---
+
 ## Getting Started
 
 First, run the development server:
