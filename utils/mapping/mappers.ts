@@ -1,4 +1,4 @@
-import { Blog, User } from "../../types/types";
+import { Blog, Draft, User } from "../../types/types";
 
 export const normalizePosts = (payload: any): Blog[] => {
   const data = payload?.blogs || [];
@@ -40,5 +40,30 @@ export const normalizeUser = (payload: any): User => {
     displayName: data.displayName,
     avatar: data.avatar,
     role: data.role || "user", // Default role since backend doesn't provide it
+  };
+};
+
+export const normalizeDrafts = (payload: any): Draft[] => {
+  const data = payload?.unfinishedDrafts || [];
+
+  return data.map((item: any) => ({
+    id: item.id || item.id,
+    title: item.title || item.Title,
+    content: item.content || item.Content,
+    preview: item.preview || item.Preview,
+    createdOn: item.createdOn || item.CreatedOn,
+    userId: item.userId || item.UserId,
+  }));
+};
+
+export const normalizeDraft = (payload: any): Draft => {
+  const data = payload?.draft;
+  return {
+    id: data.id,
+    title: data.title,
+    content: data.content,
+    preview: data.preview,
+    createdOn: data.createdOn,
+    userId: data.userId,
   };
 };

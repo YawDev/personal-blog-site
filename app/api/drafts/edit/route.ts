@@ -4,17 +4,15 @@ import { NextResponse } from "next/server";
 
 export async function PUT(request: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+    const body = await request.json();
 
-    if (!id) {
+    if (!body.userId) {
       return NextResponse.json(
         { status: 400, data: null, message: "Missing user id" },
         { status: 400 },
       );
     }
 
-    const body = await request.json();
     const httpClient = createHttpClient();
 
     const cookieHeader = request.headers.get("cookie") ?? "";
@@ -24,12 +22,16 @@ export async function PUT(request: Request) {
       .find((c) => c.startsWith("access_token="))
       ?.slice("access_token=".length);
 
-    const response = await httpClient.put(`/api/account/edit/${id}`, body, {
-      headers: {
-        "Content-Type": "application/json",
-        ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+    const response = await httpClient.put(
+      `/drafts/${body.draftId}/users/${body.userId}/edit`,
+      body,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
+        },
       },
-    });
+    );
 
     console.log("Backend response status:", response.status);
     console.log("Backend response data:", response.data);
@@ -39,7 +41,7 @@ export async function PUT(request: Request) {
         {
           status: response.status,
           data: null,
-          message: response.data?.message ?? "Account edit failed",
+          message: response.data?.message ?? "Draft edit failed",
         },
         { status: response.status },
       );
@@ -48,12 +50,12 @@ export async function PUT(request: Request) {
       {
         status: 200,
         data: null,
-        message: "Account edited successfully",
+        message: "Draft edited successfully",
       },
       { status: 200 },
     );
   } catch (error) {
-    console.error("=== EDIT ACCOUNT API ROUTE ERROR ===");
+    console.error("=== EDIT DRAFT API ROUTE ERROR ===");
     console.error("Error details:", error);
 
     if (axios.isAxiosError(error)) {
@@ -65,7 +67,7 @@ export async function PUT(request: Request) {
           status,
           data: null,
           message:
-            errorData?.Message ?? errorData?.message ?? "Account edit failed",
+            errorData?.Message ?? errorData?.message ?? "Draft edit failed",
         },
         { status },
       );
@@ -78,7 +80,7 @@ export async function PUT(request: Request) {
         message:
           error instanceof Error
             ? error.message
-            : "An error occurred during registration.",
+            : "An error occurred during draft edit.",
       },
       { status: 500 },
     );
