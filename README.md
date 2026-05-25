@@ -5,7 +5,145 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ### Docs
 
 - [Architecture & Data Flow](docs/ARCHITECTURE.md) — how the UI, BFF, and .NET API connect; CRUD flows; auth; glossary for beginners
+- [Auth Provider](#auth-provider-providerauth-providertsx) — how the app knows who is logged in and shares that across every page
 - [Custom Form Hooks](#custom-form-hooks-hooks) — how `useLoginForm`, `useSignUpForm`, `usePostForm`, `useEditProfileForm` work
+
+---
+
+## Auth Provider (`providers/auth-provider.tsx`)
+
+This file answers one question: **"Who is currently logged in, and how does every part of the app find out?"**
+
+### The problem it solves
+
+The navbar, the blog list, the create-post button — they all need to know whether a user is logged in. Without a shared system, each component would have to individually figure that out, which would mean duplicate work and them going out of sync.
+
+The auth provider creates a single source of truth for the current user, and makes it available to any component anywhere in the app without having to pass it down manually.
+
+---
+
+### Concepts first
+
+**Context** — React's built-in way of making a value available to every component in the app without threading it through props. Think of it like a whiteboard in the middle of the room: any component can read from it or write to it.
+
+**Provider** — the component that owns the whiteboard and decides what's written on it.
+
+**useState** — a React mechanism for holding a value that, when it changes, causes any component reading it to automatically update.
+
+**useMemo** — wraps a calculation so it only reruns when its inputs actually change, avoiding unnecessary work.
+
+---
+
+### Line-by-line execution
+
+#### 1. Create the whiteboard with default values (lines 5–10)
+
+```ts
+const AuthContext = createContext<IUserContext>({
+  user: null,
+  isLoggedIn: false,
+  isLoading: false,
+  setUser: (value: User | null) => {},
+});
+```
+
+This sets up the shared whiteboard. The defaults here (`user: null`, `isLoggedIn: false`) are only used if a component tries to read from the whiteboard before any Provider has been set up — in practice this never happens in normal use. Think of it as a fallback blank state.
+
+#### 2. The AuthProvider component receives the initial user (lines 12–18)
+
+```ts
+export function AuthProvider({ children, initialUser }) { ... }
+```
+
+`AuthProvider` is a wrapper component — it wraps the entire app (you can see this in `layout.tsx`). It receives two things:
+- `children` — everything inside it (the whole app)
+- `initialUser` — the user object resolved **on the server** before the page was sent to the browser (either a real user, or `null` if no one is logged in)
+
+#### 3. Seed state with whoever was logged in at page load (line 19)
+
+```ts
+const [user, setUser] = useState<User | null>(initialUser);
+```
+
+This takes `initialUser` (the server-resolved value) and stores it as React state. From this point on, `user` is the live, up-to-date source of truth.
+
+- If `initialUser` was a real user object: the app starts knowing the user is logged in, with no visible "flash" of a logged-out state.
+- If `initialUser` was `null`: the app starts treating the user as logged out.
+
+`setUser` is the function that updates this — it's called after a successful login or logout to switch the state.
+
+#### 4. Package everything up for sharing (lines 22–30)
+
+```ts
+const value = useMemo(
+  () => ({
+    user,
+    isLoggedIn: !!user,
+    isLoading: false,
+    setUser,
+  }),
+  [user],
+);
+```
+
+This builds the object that gets written to the whiteboard. It contains:
+- `user` — the full user object (name, id, email, etc.), or `null`
+- `isLoggedIn` — a simple true/false derived directly from whether `user` is set. The `!!` is just a shortcut to convert any value to a boolean: `!!null` → `false`, `!!(a user object)` → `true`
+- `isLoading` — hardcoded `false` here because the initial user is already resolved by the time this runs
+- `setUser` — the function components can call to update who is logged in
+
+`useMemo` wraps this so a new object is only created when `user` actually changes, not on every render.
+
+#### 5. Write to the whiteboard and render the app (lines 32–33)
+
+```ts
+return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+```
+
+This writes `value` onto the whiteboard (`AuthContext.Provider`) and renders all the child components (`children` = the whole app) inside it. Any component that calls `useAuth()` from this point can read the current user.
+
+#### 6. The useAuth hook — how components read from the whiteboard (line 35)
+
+```ts
+export const useAuth = () => useContext(AuthContext);
+```
+
+This is the read handle. Any component — NavBar, blog list, create button — calls `useAuth()` to get the current `{ user, isLoggedIn, isLoading, setUser }`. When `setUser` is called (e.g. on login), React automatically re-renders every component that called `useAuth()` so they all update at once.
+
+---
+
+### End-to-end flow
+
+```
+Browser requests a page
+        │
+        ▼
+Server runs getInitialUser()
+  checks for access_token cookie
+  hits /api/auth/me
+  returns User object or null
+        │
+        ▼
+layout.tsx passes result as initialUser to <AuthProvider>
+        │
+        ▼
+AuthProvider seeds useState(initialUser)
+  writes user, isLoggedIn, setUser to context
+        │
+        ▼
+Page renders — NavBar calls useAuth()
+  isLoggedIn = true  → shows logout button, drafts link, create link
+  isLoggedIn = false → shows login / sign up links
+        │
+        ▼
+User logs in (client-side)
+  login API responds with user data
+  setUser(user) is called
+        │
+        ▼
+React re-renders every component that called useAuth()
+  NavBar, blog list, etc. all update immediately
+```
 
 ---
 

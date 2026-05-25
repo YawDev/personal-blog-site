@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const NavBar = () => {
-  const { isLoggedIn, isLoading, setUser } = useAuth();
+  const { isLoggedIn, isLoading, setUser, user } = useAuth();
   const router = useRouter();
 
   return (
@@ -31,12 +31,21 @@ const NavBar = () => {
             </Link>
 
             {!isLoading && isLoggedIn && (
-              <Link
-                href="/blogs/create"
-                className="relative block mt-4 lg:inline-block lg:mt-0 text-teal-100 hover:text-white mr-4 px-3 py-2 rounded-lg transition-all duration-300 hover:bg-teal-700 hover:shadow-lg hover:scale-105 active:scale-95 active:bg-teal-800"
-              >
-                Post new Blog
-              </Link>
+              <>
+                <Link
+                  href="/blogs/create"
+                  className="relative block mt-4 lg:inline-block lg:mt-0 text-teal-100 hover:text-white mr-4 px-3 py-2 rounded-lg transition-all duration-300 hover:bg-teal-700 hover:shadow-lg hover:scale-105 active:scale-95 active:bg-teal-800"
+                >
+                  Post a Blog
+                </Link>
+
+                <Link
+                  href={`/drafts?id=${user?.id}`}
+                  className="relative block mt-4 lg:inline-block lg:mt-0 text-teal-100 hover:text-white mr-4 px-3 py-2 rounded-lg transition-all duration-300 hover:bg-teal-700 hover:shadow-lg hover:scale-105 active:scale-95 active:bg-teal-800"
+                >
+                  Unpublished Posts
+                </Link>
+              </>
             )}
           </div>
 
