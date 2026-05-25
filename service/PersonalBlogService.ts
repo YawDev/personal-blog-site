@@ -4,10 +4,13 @@ import {
 } from "@/formHelpers/formTypes";
 import {
   Blog,
+  Draft,
   EditProfileRequest,
   EditProfileResponse,
   LoginRequest,
   LoginResponse,
+  SaveDraftRequest,
+  SaveDraftResponse,
   SavePostRequest,
   SavePostResponse,
   SignUpRequest,
@@ -88,7 +91,7 @@ export const LoginApi = async (body: LoginRequest): Promise<LoginResponse> => {
       } else {
         return {
           status: response.status,
-          data: response.data, //normalizeUser(response.data),
+          data: response.data.data ?? null,
           message: "Login successful",
         };
       }
@@ -323,4 +326,178 @@ export const deletePostApi = async (
       console.error("Not able to delete blog: ", error.response?.data);
       return false;
     });
+};
+
+export const deleteDraftApi = async (
+  draftId: string,
+  userId: string | null,
+): Promise<boolean> => {
+  return await axios
+    .delete(`${getBffBaseUrl()}/api/drafts/delete`, {
+      data: { draftId, userId },
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Draft deleted successfully: ", response.data);
+      return response.data?.status === 200;
+    })
+    .catch((error) => {
+      console.error("Not able to delete draft: ", error.response?.data);
+      return false;
+    });
+};
+
+export const createDraftApi = async (
+  userId: string,
+  data: { title: string; content: string; preview: string },
+): Promise<SaveDraftResponse> => {
+  let body: SaveDraftRequest = {
+    title: data.title,
+    content: data.content,
+    preview: data.preview,
+    userId: userId,
+  };
+
+  var res = await axios
+    .post(`${getBffBaseUrl()}/api/drafts/create`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Draft created successfully: ", response.data);
+      return {
+        status: response.status,
+        message: "Draft created successfully",
+        newDraftId: response.data.data?.draftGuid ?? null,
+      };
+    })
+    .catch((error) => {
+      const status = error.response?.status;
+      if (status && status >= 400 && status < 500) {
+        console.error("Not able to create draft: ", error.response.data);
+        return {
+          status,
+          message:
+            error.response.data?.Message ??
+            error.response.data?.message ??
+            "Not able to create draft.",
+          newDraftId: null,
+        };
+      }
+
+      console.error("Error creating draft: ", error);
+      return {
+        status: status ?? 500,
+        message: "Error creating draft.",
+        newDraftId: null,
+      };
+    });
+  return res;
+};
+
+export const editDraftApi = async (
+  _userId: string,
+  data: Draft,
+): Promise<SaveDraftResponse> => {
+  let body: SaveDraftRequest & { draftId: string } = {
+    title: data.title,
+    content: data.content,
+    preview: data.preview,
+    userId: data.userId,
+    draftId: data.id,
+  };
+
+  var res = await axios
+    .put(`${getBffBaseUrl()}/api/drafts/edit`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Draft edited successfully: ", response.data);
+      return {
+        status: response.status,
+        message: "Draft edited successfully",
+      };
+    })
+    .catch((error) => {
+      const status = error.response?.status;
+      if (status && status >= 400 && status < 500) {
+        console.error("Not able to edit draft: ", error.response.data);
+        return {
+          status,
+          message:
+            error.response.data?.Message ??
+            error.response.data?.message ??
+            "Not able to edit draft.",
+        };
+      }
+
+      console.error("Error editing draft: ", error);
+      return {
+        status: status ?? 500,
+        message: "Error editing draft.",
+      };
+    });
+  return res;
+};
+
+export const GetAllDraftsByUser = async (userId: string): Promise<Draft[]> => {
+  var drafts = await axios
+    .get(`${getBffBaseUrl()}/api/drafts/getAll?id=${userId}`, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      if (response?.status === 200) {
+        console.log("Fetched drafts:", response.data);
+        console.log("Drafts fetched successfully.");
+        console.log(
+          "Drafts data structure:",
+          JSON.stringify(response.data, null, 2),
+        );
+        return response.data?.data ?? [];
+      } else {
+        console.log("Failed to fetch drafts.");
+        return [];
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching drafts:", error);
+      return [];
+    });
+  return drafts;
+};
+
+export const GetDraftById = async (
+  draftId: string,
+  userId: string,
+): Promise<Draft | null> => {
+  var draft = await axios
+    .get(
+      `${getBffBaseUrl()}/api/drafts/getById?draftId=${draftId}&id=${userId}`,
+      {
+        timeout: 5000,
+        withCredentials: true,
+      },
+    )
+    .then((response) => {
+      if (response?.status === 200) {
+        console.log("Fetched draft:", response.data);
+        console.log("Draft fetched successfully.");
+        console.log(
+          "Draft data structure:",
+          JSON.stringify(response.data, null, 2),
+        );
+        return response.data?.data ?? null;
+      } else {
+        console.log("Failed to fetch draft.");
+        return null;
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching draft:", error);
+      return null;
+    });
+  return draft;
 };

@@ -22,7 +22,7 @@ export type Blog = IPost & {
 
 export type Draft = IPost & {
   createdOn: string;
-  createdBy: string;
+  userId: string;
 };
 
 export type User = {
@@ -130,4 +130,50 @@ export type UpstreamBlogByIdResponse = {
     userId: string;
   };
   message?: string;
+};
+
+export type SaveDraftRequest = {
+  title: string;
+  content: string;
+  preview: string;
+  userId: string | null;
+};
+
+export type SaveDraftResponse = {
+  status: number;
+  message: string;
+  newDraftId?: string | null;
+};
+
+export type DeleteDraftRequest = {
+  draftId: string;
+  userId: string | null;
+};
+
+export type GetDraftByIdRequest = {
+  draftId: string;
+};
+
+export type DeleteDraftResponse = {
+  status: number;
+  message: string;
+};
+
+export type PublishPostResponse = {
+  status: number;
+  message: string;
+  newPostId?: string | null;
+};
+
+export type UpdateDraftResponse = {
+  status: number;
+  message: string;
+};
+
+export type UpstreamDraftsResponse = {
+  unfinishedDrafts?: Draft[];
+};
+
+export type UpstreamDraftByIdResponse = {
+  draft?: Draft;
 };

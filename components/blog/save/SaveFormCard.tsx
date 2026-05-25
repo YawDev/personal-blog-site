@@ -201,7 +201,11 @@ const SaveFormCard = ({
         />
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-end pt-6">
-          <SaveDraftButton formState={formState} mode={mode} />
+          <SaveDraftButton
+            formState={formState}
+            mode={mode}
+            userId={user?.id}
+          />
           <PublishArticleButton formState={formState} mode={mode} />
         </div>
       </form>
