@@ -162,7 +162,7 @@ export type DeleteDraftResponse = {
 export type PublishPostResponse = {
   status: number;
   message: string;
-  newPostId?: string | null;
+  postGuid?: string | null;
 };
 
 export type UpdateDraftResponse = {

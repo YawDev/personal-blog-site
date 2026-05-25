@@ -8,9 +8,18 @@ import { savePostToLocalStorage } from "@/utils/browser/InMemory";
 import { FormMode } from "@/utils/forms/FormHelpers";
 import { IPostFormState } from "@/formHelpers/formTypes";
 import { create } from "domain";
-import { createPostApi, editPostApi } from "@/service/PersonalBlogService";
+import {
+  createPostApi,
+  editPostApi,
+  publishDraftApi,
+} from "@/service/PersonalBlogService";
 import { useAuth } from "@/providers/auth-provider";
-import { Alert, Blog, SavePostResponse } from "@/types/types";
+import {
+  Alert,
+  Blog,
+  PublishPostResponse,
+  SavePostResponse,
+} from "@/types/types";
 import { useEffect, useState } from "react";
 import AlertMessage from "@/components/shared/AlertMessage";
 
@@ -72,6 +81,17 @@ const SaveFormCard = ({
     return result;
   };
 
+  const handlePublishDraft = async (): Promise<PublishPostResponse> => {
+    let result = await publishDraftApi(user?.id || "", {
+      title: formState.title.value,
+      content: formState.content.value,
+      preview: formState.preview.value,
+      draftId: postIdParam || "",
+    });
+
+    return result;
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
       <form
@@ -98,6 +118,20 @@ const SaveFormCard = ({
             let result = await handleEditPost();
             if (result.status === 200) {
               router.push(`/blogs/${postIdParam}`);
+            } else {
+              //handle error case, show alert or something
+              setAlert({
+                show: true,
+                message: result.message,
+                apiStatus: result.status,
+              });
+            }
+          }
+
+          if (mode === FormMode.EditDraft) {
+            let result = await handlePublishDraft();
+            if (result.status === 200) {
+              router.push(`/blogs/${result.postGuid}`);
             } else {
               //handle error case, show alert or something
               setAlert({

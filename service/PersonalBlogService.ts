@@ -9,6 +9,7 @@ import {
   EditProfileResponse,
   LoginRequest,
   LoginResponse,
+  PublishPostResponse,
   SaveDraftRequest,
   SaveDraftResponse,
   SavePostRequest,
@@ -274,6 +275,8 @@ export const editPostApi = async (
     postId: data.id,
   };
 
+  console.log("Editing post with body: ", body);
+
   var res = await axios
     .put(`${getBffBaseUrl()}/api/blogs/edit`, body, {
       timeout: 5000,
@@ -500,4 +503,53 @@ export const GetDraftById = async (
       return null;
     });
   return draft;
+};
+
+export const publishDraftApi = async (
+  userId: string,
+  data: { draftId: string; title: string; content: string; preview: string },
+): Promise<PublishPostResponse> => {
+  let body = {
+    draftId: data.draftId,
+    title: data.title,
+    content: data.content,
+    preview: data.preview,
+    userId: userId,
+  };
+
+  var res = await axios
+    .post(`${getBffBaseUrl()}/api/drafts/publish`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log("Draft published successfully: ", response.data);
+      return {
+        status: response.status,
+        message: "Draft published successfully",
+        postGuid: response.data.data?.postGuid ?? null,
+      };
+    })
+    .catch((error) => {
+      const status = error.response?.status;
+      if (status && status >= 400 && status < 500) {
+        console.error("Not able to publish draft: ", error.response.data);
+        return {
+          status,
+          message:
+            error.response.data?.Message ??
+            error.response.data?.message ??
+            "Not able to publish draft.",
+          postGuid: null,
+        };
+      }
+
+      console.error("Error publishing draft: ", error);
+      return {
+        status: status ?? 500,
+        message: "Error publishing draft.",
+        postGuid: null,
+      };
+    });
+  return res;
 };

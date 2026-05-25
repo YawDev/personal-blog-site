@@ -1,7 +1,6 @@
 "use client";
 
 import { FormMode } from "@/utils/forms/FormHelpers";
-import useFormValidation from "@/hooks/usePostForm";
 import { Blog } from "@/types/types";
 import { useEffect, useState } from "react";
 import setPageTitle from "@/formHelpers/formUtils";
@@ -13,6 +12,7 @@ import {
   getDraftByIdFromStorage,
 } from "@/utils/browser/localStorageFallback";
 import usePostForm from "@/hooks/usePostForm";
+import BackToDrafts from "@/components/draft/BackToDrafts";
 export function SavePostForm({
   mode,
   blogData,
@@ -67,7 +67,11 @@ export function SavePostForm({
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <BackToArticles />
+          {mode === FormMode.EditDraft ? (
+            <BackToDrafts currentUserId={blogData?.userId || ""} />
+          ) : (
+            <BackToArticles />
+          )}
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             {setPageTitle(mode)}
           </h1>

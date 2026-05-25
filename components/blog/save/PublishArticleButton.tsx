@@ -1,10 +1,11 @@
-import { FormMode, IFormState } from "@/utils/forms/FormHelpers";
+import { IPostFormState } from "@/formHelpers/formTypes";
+import { FormMode } from "@/utils/forms/FormHelpers";
 
 const PublishArticleButton = ({
   formState,
   mode,
 }: {
-  formState: IFormState;
+  formState: IPostFormState;
   mode: FormMode;
 }) => {
   return (

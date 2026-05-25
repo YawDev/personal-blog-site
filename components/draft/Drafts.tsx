@@ -1,6 +1,10 @@
+"use client";
+
 import { Draft, User } from "@/types/types";
 import Link from "next/link";
-import React from "react";
+import { useState } from "react";
+import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
+import { deleteDraftApi } from "@/service/PersonalBlogService";
 
 // const dummyDrafts: Draft[] = [
 //   {
@@ -61,6 +65,22 @@ const DraftList = ({
   currentUser: User | null;
 }) => {
   const drafts = fetchedDrafts.length > 0 ? fetchedDrafts : []; // Fallback to empty array if no drafts found or API returns null
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [currentDrafts, setCurrentDrafts] = useState<Draft[]>(drafts); // Local state to manage drafts list
+
+  const handleDelete = async (draftid: string) => {
+    // Implement delete logic here, e.g., call API to delete draft
+    var success = await deleteDraftApi(draftid, _currentUser?.id ?? "");
+    if (success) {
+      alert("Draft deleted successfully.");
+      // Optionally, you can also remove the deleted draft from the local state to update the UI immediately
+      setCurrentDrafts((prevDrafts) =>
+        prevDrafts.filter((draft) => draft.id !== draftid),
+      );
+    } else {
+      alert("Failed to delete draft. Please try again.");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -72,11 +92,13 @@ const DraftList = ({
               My Unpublished Blog Drafts
             </h1>
             <p className="mt-0.5 text-sm text-slate-500">
-              {drafts.length}{" "}
-              {drafts.length === 1 ? "unpublished draft" : "unpublished drafts"}
+              {currentDrafts.length}{" "}
+              {currentDrafts.length === 1
+                ? "unpublished draft"
+                : "unpublished drafts"}
             </p>
           </div>
-          {fetchedDrafts.length > 0 && (
+          {currentDrafts.length > 0 && (
             <Link
               href="/blogs/create"
               className="inline-flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-teal-700 transition-colors duration-150"
@@ -130,7 +152,7 @@ const DraftList = ({
           </div>
         ) : (
           <ul className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-            {drafts.map((draft) => (
+            {currentDrafts.map((draft) => (
               <li
                 key={draft.id}
                 className="group flex flex-col sm:flex-row sm:items-center gap-4 px-6 py-5 hover:bg-slate-50 transition-colors duration-150"
@@ -164,6 +186,13 @@ const DraftList = ({
                     {draft.preview}
                   </p>
                 </div>
+                <ConfirmDeleteModal
+                  isOpen={isDeleteModalOpen}
+                  setIsOpen={setIsDeleteModalOpen}
+                  onClose={() => setIsDeleteModalOpen(false)}
+                  onConfirm={() => handleDelete(draft.id)}
+                  mode="draft"
+                />
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-150">
@@ -184,6 +213,9 @@ const DraftList = ({
                   <button
                     type="button"
                     className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-100 hover:border-red-300 transition-colors duration-150"
+                    onClick={() => {
+                      setIsDeleteModalOpen(true);
+                    }}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

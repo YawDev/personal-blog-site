@@ -8,9 +8,9 @@ import EditPostLink from "./save/EditPostLink";
 import Link from "next/dist/client/link";
 import DeletePostButton from "./DeletePostButton";
 import { useAuth } from "@/providers/auth-provider";
-import { ConfirmDeleteModal } from "./ConfirmDeleteModal";
 import { deletePostApi } from "@/service/PersonalBlogService";
 import { useRouter } from "next/dist/client/components/navigation";
+import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
 const BlogDetails = ({
   fetchedBlog,
   isLoggedIn,
@@ -74,13 +74,10 @@ const BlogDetails = ({
     return null; // Let the server loading handle this
   }
 
-  const handleDelete = async () => {
+  const handleDelete = async (postid: string) => {
     setIsDeleteModalOpen(false);
     // The actual delete logic will be handled in the DeletePostButton component
-    const response = await deletePostApi(
-      currentArticle?.id ?? "",
-      currentArticle?.userId ?? "",
-    );
+    const response = await deletePostApi(postid, currentArticle?.userId ?? "");
     if (response) {
       alert("Post deleted successfully.");
       router.push("/blogs"); // Redirect to homepage or posts list
@@ -133,7 +130,8 @@ const BlogDetails = ({
             isOpen={isDeleteModalOpen}
             setIsOpen={setIsDeleteModalOpen}
             onClose={() => setIsDeleteModalOpen(false)}
-            onConfirm={handleDelete}
+            onConfirm={() => handleDelete(currentArticle?.id ?? "")}
+            mode="post"
           />
           <div className="flex flex-wrap items-center gap-6 text-gray-600">
             <div className="flex items-center">
