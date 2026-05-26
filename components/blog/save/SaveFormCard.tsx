@@ -7,9 +7,9 @@ import { SaveDraftButton } from "./SaveDraftButton";
 import { savePostToLocalStorage } from "@/utils/browser/InMemory";
 import { FormMode } from "@/utils/forms/FormHelpers";
 import { IPostFormState } from "@/formHelpers/formTypes";
-import { create } from "domain";
 import {
   createPostApi,
+  editDraftApi,
   editPostApi,
   publishDraftApi,
 } from "@/service/PersonalBlogService";
@@ -18,6 +18,7 @@ import {
   Alert,
   Blog,
   PublishPostResponse,
+  SaveDraftResponse,
   SavePostResponse,
 } from "@/types/types";
 import { useEffect, useState } from "react";
@@ -45,6 +46,8 @@ const SaveFormCard = ({
     apiStatus: 0,
   });
 
+  const [autoSaveMessage, setAutoSaveMessage] = useState<string>("");
+
   useEffect(() => {
     if (alert.show) {
       const timer = setTimeout(() => {
@@ -54,6 +57,16 @@ const SaveFormCard = ({
       return () => clearTimeout(timer);
     }
   }, [alert.show]);
+
+  useEffect(() => {
+    if (autoSaveMessage) {
+      const timer = setTimeout(() => {
+        setAutoSaveMessage("");
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [autoSaveMessage]);
 
   const handleCreatePost = async (): Promise<SavePostResponse> => {
     let result = await createPostApi(user?.id || "", {
@@ -81,6 +94,20 @@ const SaveFormCard = ({
     return result;
   };
 
+  const handleAutoSaveDraft = async (): Promise<SaveDraftResponse> => {
+    var draftId = postIdParam;
+    let result = await editDraftApi(user?.id || "", {
+      title: formState.title.value,
+      content: formState.content.value,
+      preview: formState.preview.value,
+      id: draftId || "",
+      createdOn: blogData?.datePosted || "",
+      userId: blogData?.userId || "",
+    });
+
+    return result;
+  };
+
   const handlePublishDraft = async (): Promise<PublishPostResponse> => {
     let result = await publishDraftApi(user?.id || "", {
       title: formState.title.value,
@@ -91,6 +118,22 @@ const SaveFormCard = ({
 
     return result;
   };
+
+  useEffect(() => {
+    // Used to call edit draft api to autosave drafts after form changes and user stops typing for 5 seconds. Only applies to EditDraft mode.
+    if (mode === FormMode.EditDraft && formState.validForSubmit) {
+      const timer = setTimeout(async () => {
+        let result = await handleAutoSaveDraft();
+        if (result.status === 200) {
+          setAutoSaveMessage("Draft auto-saved successfully.");
+        } else {
+          setAutoSaveMessage("Failed to auto-save draft.");
+        }
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [mode, formState]);
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
@@ -155,6 +198,17 @@ const SaveFormCard = ({
               message={alert.message}
               variant={alert.apiStatus !== 200 ? "error" : "default"}
             />
+          </div>
+        </div>
+        <div className="max-w-md mx-auto">
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-out ${
+              autoSaveMessage
+                ? "mb-4 max-h-24 opacity-100"
+                : "mb-0 max-h-0 opacity-0"
+            }`}
+          >
+            <AlertMessage message={autoSaveMessage} variant="default" />
           </div>
         </div>
         {/* Title Field */}
