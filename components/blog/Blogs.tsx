@@ -14,6 +14,7 @@ import {
   USE_LOCAL_STORAGE_FALLBACK,
   getBlogsFromStorage,
 } from "@/utils/browser/localStorageFallback";
+import BlogSearch from "./Search";
 const BlogList = ({
   fetchedBlogs,
   currentUser,
@@ -25,6 +26,7 @@ const BlogList = ({
   const [isLoading, setIsLoading] = useState(true);
   const [visiblePostsCount, setVisiblePostsCount] = useState(minValueToDisplay);
   const [showMyPostsOnly, setShowMyPostsOnly] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
     // Use API results; fall back to localStorage only if the flag is on (dev-only).
@@ -47,8 +49,16 @@ const BlogList = ({
   // currentUser is null when nobody is logged in, so the filter is always off then.
   const filteredBlogs =
     showMyPostsOnly && currentUser
-      ? blogs.filter((blog) => blog.userId === currentUser.id)
-      : blogs;
+      ? blogs.filter(
+          (blog) =>
+            blog.userId === currentUser.id &&
+            blog.title.toLowerCase().includes(searchQuery.toLowerCase() || ""),
+        )
+      : blogs.filter((blog) => {
+          return blog.title
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase() || "");
+        });
 
   //   blogs.filter((blog) => {
   //   return blog.title.toLowerCase().includes("j".toLowerCase() || "");
@@ -141,6 +151,7 @@ const BlogList = ({
             {showMyPostsOnly ? "Showing my posts" : "Show my posts"}
           </button>
         )}
+        <BlogSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </div>
       <div className="flex flex-wrap -mx-4">
         {currentItems.map((blog) => (
