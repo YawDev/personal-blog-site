@@ -26,6 +26,7 @@ const BlogList = ({
   const [isLoading, setIsLoading] = useState(true);
   const [visiblePostsCount, setVisiblePostsCount] = useState(minValueToDisplay);
   const [showMyPostsOnly, setShowMyPostsOnly] = useState(false);
+  const [sortByOldest, setSortByOldest] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
@@ -60,9 +61,12 @@ const BlogList = ({
             .includes(searchQuery.toLowerCase() || "");
         });
 
-  //   blogs.filter((blog) => {
-  //   return blog.title.toLowerCase().includes("j".toLowerCase() || "");
-  // });
+  const sortedBlogsByDate = [...filteredBlogs].sort(
+    (a,b) => sortByOldest
+      ? new Date(a.datePosted).getTime() - new Date(b.datePosted).getTime()
+      : new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime()
+  );
+
 
   useEffect(() => {
     if (filteredBlogs) {
@@ -79,7 +83,7 @@ const BlogList = ({
     return null; // Let the server loading handle this
   }
 
-  let currentItems = GetCurrentItems(filteredBlogs, paginationData);
+  let currentItems = GetCurrentItems(sortedBlogsByDate, paginationData);
   const totalPostsOnThisPage = currentItems.length; // Actual total of available posts before slicing!
   currentItems = currentItems.slice(0, visiblePostsCount);
 
@@ -148,9 +152,22 @@ const BlogList = ({
                 : "bg-white text-teal-600 border-teal-600 hover:bg-teal-50"
             }`}
           >
-            {showMyPostsOnly ? "Showing my posts" : "Show my posts"}
+            {showMyPostsOnly ? "Show All Posts" : "Show My Posts Only"}
           </button>
-        )}
+        )}{" "}
+        <button
+            onClick={() => {
+              setSortByOldest((prev) => !prev);
+              setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+            }}
+            className={`mt-3 px-4 py-2 rounded-full text-sm font-medium border transition-colors duration-200 ${
+              sortByOldest
+                ? "bg-teal-600 text-white border-teal-600"
+                : "bg-white text-teal-600 border-teal-600 hover:bg-teal-50"
+            }`}
+          >
+            {sortByOldest ? "Sort By Newest" : "Sort By Oldest"}
+          </button>
         <BlogSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </div>
       <div className="flex flex-wrap -mx-4">

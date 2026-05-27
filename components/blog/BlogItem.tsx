@@ -40,12 +40,21 @@ const BlogItem = ({
             {blog.preview ||
               "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."}
           </p>
-          <p className="text-xs font-medium text-teal-600 mt-auto pt-4">
-            By{" "}
-            <span className="font-semibold">
-              {blog.userId === user?.id ? user.userName : "Anonymous Author"}
-            </span>
-          </p>
+          <div className="mt-auto pt-4 flex items-center justify-between border-t border-slate-100">
+            <p className="text-xs font-medium text-teal-600">
+              By{" "}
+              <span className="font-semibold">
+                {blog.userId === user?.id ? user.userName : "Anonymous Author"}
+              </span>
+            </p>
+            <p className="text-xs text-slate-400">
+              {new Date(blog.datePosted).toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </p>
+          </div>
           <Link
             href={`/blogs/${blog.id}`}
             className="text-blue-600 hover:text-blue-800 mt-3 inline-block font-semibold transition-colors cursor-pointer"
