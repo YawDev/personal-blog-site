@@ -18,9 +18,6 @@ import {
   SignUpResponse,
 } from "@/types/types";
 import axios from "axios";
-import { createHttpClient } from "@/utils/httpClientUtil";
-
-const httpClient = createHttpClient();
 
 const getBffBaseUrl = (): string => {
   if (typeof window !== "undefined") {
