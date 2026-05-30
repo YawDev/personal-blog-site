@@ -139,10 +139,10 @@ const useEditProfileForm = (initialValues: {
         const isFormValid =
           newState.userName.error === "" &&
           newState.userName.value.trim() !== "" &&
-          newState.firstName.error === "" &&
-          newState.firstName.value.trim() !== "" &&
-          newState.lastName.error === "" &&
-          newState.lastName.value.trim() !== "" &&
+          // newState.firstName.error === "" &&
+          // newState.firstName.value.trim() !== "" &&
+          // newState.lastName.error === "" &&
+          // newState.lastName.value.trim() !== "" &&
           newState.email.error === "" &&
           newState.email.value.trim() !== "";
         return {
@@ -166,10 +166,10 @@ const useEditProfileForm = (initialValues: {
         const isFormValid =
           newState.userName.error === "" &&
           newState.userName.value.trim() !== "" &&
-          newState.firstName.error === "" &&
-          newState.firstName.value.trim() !== "" &&
-          newState.lastName.error === "" &&
-          newState.lastName.value.trim() !== "" &&
+          // newState.firstName.error === "" &&
+          // newState.firstName.value.trim() !== "" &&
+          // newState.lastName.error === "" &&
+          // newState.lastName.value.trim() !== "" &&
           newState.email.error === "" &&
           newState.email.value.trim() !== "";
 
