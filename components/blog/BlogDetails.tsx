@@ -64,11 +64,6 @@ const BlogDetails = ({
     setIsLoading(false);
   }, [fetchedBlog]);
 
-  useEffect(() => {
-    if (currentArticle?.title) {
-      document.title = `Personal Blog - ${currentArticle.title}`;
-    }
-  }, [currentArticle?.title]);
 
   if (isLoading) {
     return null; // Let the server loading handle this
