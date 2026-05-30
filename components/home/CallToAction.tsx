@@ -35,7 +35,8 @@ const CallToAction = () => {
             placeholder="Enter your email address"
             className="px-6 py-4 rounded-lg text-gray-900 placeholder-gray-500 border-0 focus:ring-2 focus:ring-teal-300 outline-none min-w-80"
           />
-          <button className="bg-white text-teal-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors duration-300 shadow-lg hover:shadow-xl">
+          <button className="bg-white text-teal-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors duration-300 shadow-lg hover:shadow-xl"
+          onClick={() => alert("Not functional in demo version - subscribe functionality coming in future updates!")}>
             Subscribe Now
           </button>
         </div>
