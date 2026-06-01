@@ -6,6 +6,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 - [Architecture & Data Flow](docs/ARCHITECTURE.md) — how the UI, BFF, and .NET API connect; CRUD flows; auth; glossary for beginners
 - [Auth Provider](#auth-provider-providerauth-providertsx) — how the app knows who is logged in and shares that across every page
+- [Token Refresh Interceptor](#token-refresh-interceptor-servicepersonalblogservicets) — how the app silently renews a session without interrupting the user
 - [Custom Form Hooks](#custom-form-hooks-hooks) — how `useLoginForm`, `useSignUpForm`, `usePostForm`, `useEditProfileForm` work
 
 ---
@@ -143,6 +144,98 @@ User logs in (client-side)
         ▼
 React re-renders every component that called useAuth()
   NavBar, blog list, etc. all update immediately
+```
+
+---
+
+## Token Refresh Interceptor (`service/PersonalBlogService.ts`)
+
+This file answers one question: **"What happens when the user's login session expires while they're in the middle of doing something?"**
+
+### The problem it solves
+
+When a user logs in, they receive a session token that lasts 30 minutes. If they leave the app open and come back later, that token will have expired. Without any handling, the very next thing they try to do — save a post, load their drafts — would silently fail or show a confusing error.
+
+The interceptor solves this invisibly. It watches every request the app makes. If the server says "this token is expired", it quietly goes and gets a new token, then replays the original request as if nothing happened. The user never sees an error.
+
+---
+
+### Concepts first
+
+**Request** — any time the app asks the server for data or sends data to be saved, that is a request.
+
+**Response** — what the server sends back. It includes a status code: `200` means success, `401` means "you're not authorised / your session expired".
+
+**Interceptor** — a piece of code that sits between your app and the network, watching every response before it reaches the rest of the code. Like a postal worker who can intercept a letter, deal with a problem, and re-send it before you ever know there was an issue.
+
+**Token refresh** — the process of swapping an expired session token for a fresh one, without the user having to log in again.
+
+---
+
+### How it works, step by step
+
+#### 1. Every API call goes through one shared Axios instance
+
+Instead of each function making its own raw request, all of them use a single shared instance called `bffAxios`. This means the interceptor only needs to be set up once and it covers every request automatically.
+
+#### 2. The interceptor watches every response
+
+After every response comes back from the server, the interceptor checks it. If the response was successful, it does nothing — the data passes straight through.
+
+#### 3. If the server says 401 (session expired)
+
+The interceptor steps in:
+
+1. It marks the original request with a `_retry` flag so it won't try this more than once
+2. It calls the refresh endpoint (`/api/auth/refresh`) to get a new session token
+3. If the refresh succeeds, it **replays the original request** with the new token
+4. The caller (the component or hook that made the request) receives the data it wanted, with no knowledge that a refresh happened
+
+#### 4. If the refresh itself fails
+
+If the refresh call also comes back as 401 — meaning the session is truly dead and cannot be renewed — the interceptor stops trying and lets the original error through. The app can then handle it as a genuine logout scenario.
+
+#### 5. The refresh endpoint is excluded from triggering another refresh
+
+The interceptor checks whether the failing request was the refresh call itself. If it was, it does not try to refresh again. This prevents an infinite loop where a failed refresh triggers another refresh, which triggers another, endlessly.
+
+---
+
+### End-to-end flow
+
+```
+User clicks "Save post"
+        │
+        ▼
+savePostApi() sends request to BFF
+        │
+        ▼
+Server responds 401 — session expired
+        │
+        ▼
+Interceptor catches the 401
+  original request flagged as _retry
+        │
+        ▼
+Interceptor calls /api/auth/refresh
+        │
+        ├── Refresh succeeds → new token set in cookie
+        │         │
+        │         ▼
+        │   Interceptor replays the original save request
+        │         │
+        │         ▼
+        │   Server responds 200 — post saved
+        │         │
+        │         ▼
+        │   savePostApi() receives success as if nothing happened
+        │   User sees: post saved successfully
+        │
+        └── Refresh fails (401) → session truly expired
+                  │
+                  ▼
+            Original 401 error is passed through
+            App can redirect to login
 ```
 
 ---

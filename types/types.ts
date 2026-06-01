@@ -82,6 +82,12 @@ export type LoginResponse = {
   message: string;
 };
 
+export type RefreshTokenResponse = {
+  status: number;
+  data: User | null;
+  message: string;
+};
+
 export type SignUpResponse = {
   status: number;
   message: string;
@@ -106,6 +112,16 @@ export interface IUserContext {
 
 // BFF types
 export type UpstreamLoginResponse = {
+  user?: {
+    id?: string;
+    userName?: string;
+    email?: string;
+    Email?: string;
+  };
+  message?: string;
+};
+
+export type UpstreamRefreshUserSessionResponse = {
   user?: {
     id?: string;
     userName?: string;
