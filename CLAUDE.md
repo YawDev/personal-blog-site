@@ -71,6 +71,16 @@ Next.js route handlers in `app/api/` act as a Backend-for-Frontend, proxying req
 - Auth state is seeded from `initialUser` prop (resolved server-side from the `/api/auth/me` route).
 - Protected write operations pass the user's GUID in the route (`/blogs/create/{id}`).
 
+## Token Refresh Interceptor (`service/PersonalBlogService.ts`)
+All client-side API calls go through a single `bffAxios` instance (not raw `axios`). A response interceptor is attached to it:
+
+- On any `401` response, it calls `POST /api/auth/refresh` once to get a new token
+- On refresh success, it replays the original request transparently — the caller never sees the 401
+- On refresh failure (401 again), it rejects with the original error
+- The refresh URL is excluded from triggering another refresh to prevent infinite loops (`_retry` flag + URL check)
+
+The `httpClientUtil.ts` factory is separate — it creates an instance pointed at `BACKEND_URL` (the .NET backend) for use in BFF route handlers only. The interceptor lives on the client-side `bffAxios` instance, which targets the BFF (`getBffBaseUrl()`).
+
 ## Key Service Functions (`service/PersonalBlogService.ts`)
 
 | Function | BFF Route | Description |

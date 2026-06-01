@@ -10,6 +10,7 @@ import {
   LoginRequest,
   LoginResponse,
   PublishPostResponse,
+  RefreshTokenResponse,
   SaveDraftRequest,
   SaveDraftResponse,
   SavePostRequest,
@@ -27,8 +28,37 @@ const getBffBaseUrl = (): string => {
   return process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 };
 
+const bffAxios = axios.create({
+  timeout: 5000,
+  withCredentials: true,
+});
+
+bffAxios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (
+      error.response?.status === 401 &&
+      !(originalRequest as any)._retry &&
+      !originalRequest.url?.includes("/api/auth/refresh")
+    ) {
+      (originalRequest as any)._retry = true;
+
+      try {
+        await bffAxios.post(`${getBffBaseUrl()}/api/auth/refresh`, null);
+        return bffAxios(originalRequest);
+      } catch {
+        return Promise.reject(error);
+      }
+    }
+
+    return Promise.reject(error);
+  },
+);
+
 export const GetAllPosts = async (): Promise<Blog[]> => {
-  var posts = await axios
+  var posts = await bffAxios
     .get(`${getBffBaseUrl()}/api/blogs`, {
       timeout: 5000,
       withCredentials: true,
@@ -55,7 +85,7 @@ export const GetAllPosts = async (): Promise<Blog[]> => {
 };
 
 export const GetPostsById = async (id: string): Promise<Blog | null> => {
-  var post = await axios
+  var post = await bffAxios
     .get(`${getBffBaseUrl()}/api/blogById?id=${id}`, {
       timeout: 5000,
       withCredentials: true,
@@ -72,7 +102,7 @@ export const GetPostsById = async (id: string): Promise<Blog | null> => {
 };
 
 export const LoginApi = async (body: LoginRequest): Promise<LoginResponse> => {
-  var res = await axios
+  var res = await bffAxios
     .post(`${getBffBaseUrl()}/api/auth/login`, body, {
       timeout: 5000,
       withCredentials: true,
@@ -127,7 +157,7 @@ export const SignUpApi = async (
     lastName: data.lastName.value,
   };
 
-  var user = await axios
+  var user = await bffAxios
     .post(`${getBffBaseUrl()}/api/auth/register`, body, {
       timeout: 5000,
       withCredentials: true,
@@ -157,6 +187,49 @@ export const SignUpApi = async (
   return user;
 };
 
+export const RefreshTokenApi = async (body: null): Promise<RefreshTokenResponse> => {
+  var res = await bffAxios
+    .post(`${getBffBaseUrl()}/api/auth/refresh`, null, {
+      timeout: 5000,
+    })
+    .then((response) => {
+      console.log("response", response);
+      console.log("User authenticated: ", response.data);
+      if (response.status === 401) {
+        return {
+          status: response.status,
+          data: null,
+          message: "User session expired.",
+        };
+      } else {
+        return {
+          status: response.status,
+          data: response.data.data ?? null,
+          message: "Token refresh successful",
+        };
+      }
+    })
+    .catch((error) => {
+      console.error("Error refreshing token: ", error);
+      console.log(error.response);
+      if (error.response?.status === 401) {
+        return {
+          status: error.response?.status,
+          data: null,
+          message: "User session expired.",
+        };
+      }
+      return {
+        status: error.response?.status,
+        data: null,
+        message: "Server is currently down.",
+        error: error,
+      };
+    });
+
+  return res;
+};
+
 export const EditProfileApi = async (
   userId: string,
   data: IEditProfileFormState,
@@ -168,7 +241,7 @@ export const EditProfileApi = async (
     LastName: data.lastName.value,
   };
 
-  var user = await axios
+  var user = await bffAxios
     .put(`${getBffBaseUrl()}/api/auth/account/edit?id=${userId}`, body, {
       timeout: 5000,
       withCredentials: true,
@@ -199,7 +272,7 @@ export const EditProfileApi = async (
 };
 
 export const logoutApi = async (): Promise<boolean> => {
-  var user = await axios
+  var user = await bffAxios
     .post(`${getBffBaseUrl()}/api/auth/logout`, null, {
       timeout: 5000,
       withCredentials: true,
@@ -226,7 +299,7 @@ export const createPostApi = async (
     userId: data.userId,
   };
 
-  var res = await axios
+  var res = await bffAxios
     .post(`${getBffBaseUrl()}/api/blogs/create`, body, {
       timeout: 5000,
       withCredentials: true,
@@ -274,7 +347,7 @@ export const editPostApi = async (
 
   console.log("Editing post with body: ", body);
 
-  var res = await axios
+  var res = await bffAxios
     .put(`${getBffBaseUrl()}/api/blogs/edit`, body, {
       timeout: 5000,
       withCredentials: true,
@@ -312,7 +385,7 @@ export const deletePostApi = async (
   postId: string,
   userId: string | null,
 ): Promise<boolean> => {
-  return await axios
+  return await bffAxios
     .delete(`${getBffBaseUrl()}/api/blogs/delete`, {
       data: { postId, userId },
       timeout: 5000,
@@ -332,7 +405,7 @@ export const deleteDraftApi = async (
   draftId: string,
   userId: string | null,
 ): Promise<boolean> => {
-  return await axios
+  return await bffAxios
     .delete(`${getBffBaseUrl()}/api/drafts/delete`, {
       data: { draftId, userId },
       timeout: 5000,
@@ -359,7 +432,7 @@ export const createDraftApi = async (
     userId: userId,
   };
 
-  var res = await axios
+  var res = await bffAxios
     .post(`${getBffBaseUrl()}/api/drafts/create`, body, {
       timeout: 5000,
       withCredentials: true,
@@ -408,7 +481,7 @@ export const editDraftApi = async (
     draftId: data.id,
   };
 
-  var res = await axios
+  var res = await bffAxios
     .put(`${getBffBaseUrl()}/api/drafts/edit`, body, {
       timeout: 5000,
       withCredentials: true,
@@ -443,7 +516,7 @@ export const editDraftApi = async (
 };
 
 export const GetAllDraftsByUser = async (userId: string): Promise<Draft[]> => {
-  var drafts = await axios
+  var drafts = await bffAxios
     .get(`${getBffBaseUrl()}/api/drafts/getAll?id=${userId}`, {
       timeout: 5000,
       withCredentials: true,
@@ -473,7 +546,7 @@ export const GetDraftById = async (
   draftId: string,
   userId: string,
 ): Promise<Draft | null> => {
-  var draft = await axios
+  var draft = await bffAxios
     .get(
       `${getBffBaseUrl()}/api/drafts/getById?draftId=${draftId}&id=${userId}`,
       {
@@ -514,7 +587,7 @@ export const publishDraftApi = async (
     userId: userId,
   };
 
-  var res = await axios
+  var res = await bffAxios
     .post(`${getBffBaseUrl()}/api/drafts/publish`, body, {
       timeout: 5000,
       withCredentials: true,
