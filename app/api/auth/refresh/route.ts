@@ -21,7 +21,7 @@ const POST = async (request: Request) => {
     const data: UpstreamRefreshUserSessionResponse = response.data;
     const normalizedUser = normalizeUser(data);
 
-    return NextResponse.json(
+    const nextResponse = NextResponse.json(
       {
         status: 200,
         data: normalizedUser,
@@ -29,6 +29,17 @@ const POST = async (request: Request) => {
       },
       { status: 200 },
     );
+
+    // Forward the new access_token + refresh_token cookies the .NET backend set
+    const setCookie = response.headers["set-cookie"];
+    if (setCookie) {
+      const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
+      cookies.forEach((cookie) =>
+        nextResponse.headers.append("Set-Cookie", cookie),
+      );
+    }
+
+    return nextResponse;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 401) {
