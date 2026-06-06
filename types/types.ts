@@ -56,6 +56,13 @@ export type SavePostRequest = {
   userId: string | null;
 };
 
+export type EmailShareLinkRequest = {
+  postId: string;
+  recipientEmail: string;
+  identityUserId: string | null;
+  blogShareLink: string;
+};
+
 export type EditProfileRequest = {
   FirstName: string;
   LastName: string;
@@ -179,6 +186,12 @@ export type PublishPostResponse = {
   status: number;
   message: string;
   postGuid?: string | null;
+};
+
+export type EmailShareLinkResponse = {
+  status: number;
+  message: string;
+  eventGuid?: string | null;
 };
 
 export type UpdateDraftResponse = {

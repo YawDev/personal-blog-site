@@ -64,7 +64,6 @@ const BlogDetails = ({
     setIsLoading(false);
   }, [fetchedBlog]);
 
-
   if (isLoading) {
     return null; // Let the server loading handle this
   }
@@ -266,7 +265,10 @@ const BlogDetails = ({
       </main>
 
       {/* Call to Action - Perfect placement after engaging content! */}
-      <CallToAction />
+      <CallToAction
+        postId={fetchedBlog?.id ?? ""}
+        currentUserId={user?.id ?? null}
+      />
     </article>
   );
 };
