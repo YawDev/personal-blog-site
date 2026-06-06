@@ -7,6 +7,8 @@ import {
   Draft,
   EditProfileRequest,
   EditProfileResponse,
+  EmailShareLinkRequest,
+  EmailShareLinkResponse,
   LoginRequest,
   LoginResponse,
   PublishPostResponse,
@@ -187,7 +189,9 @@ export const SignUpApi = async (
   return user;
 };
 
-export const RefreshTokenApi = async (body: null): Promise<RefreshTokenResponse> => {
+export const RefreshTokenApi = async (
+  body: null,
+): Promise<RefreshTokenResponse> => {
   var res = await bffAxios
     .post(`${getBffBaseUrl()}/api/auth/refresh`, null, {
       timeout: 5000,
@@ -328,6 +332,51 @@ export const createPostApi = async (
       return {
         status: status ?? 500,
         message: "Error creating blog.",
+      };
+    });
+  return res;
+};
+
+export const shareLinkEmailApi = async (
+  data: EmailShareLinkRequest,
+): Promise<EmailShareLinkResponse> => {
+  let body: EmailShareLinkRequest = data;
+
+  var res = await bffAxios
+    .post(`${getBffBaseUrl()}/api/blogs/sharelink`, body, {
+      timeout: 5000,
+      withCredentials: true,
+    })
+    .then((response) => {
+      console.log(
+        "Email sharelink sent successfully for this post!: ",
+        response.data,
+      );
+      return {
+        status: response.status,
+        message: "Email sent successfully!",
+      };
+    })
+    .catch((error) => {
+      const status = error.response?.status;
+      if (status && status >= 400 && status < 500) {
+        console.error(
+          "Not able to share blog page via email: ",
+          error.response.data,
+        );
+        return {
+          status,
+          message:
+            error.response.data?.Message ??
+            error.response.data?.message ??
+            "Not able to send email to share blog page.",
+        };
+      }
+
+      console.error("Error sharing blog: ", error);
+      return {
+        status: status ?? 500,
+        message: "Error sending email to share blog.",
       };
     });
   return res;

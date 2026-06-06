@@ -3,6 +3,19 @@
 @theme {
   --animate-modal-backdrop: modal-backdrop 0.2s ease-out;
   --animate-modal-panel: modal-panel 0.2s ease-out;
+  --animate-check-pop: check-pop 0.3s ease-out;
+  --animate-check-draw: check-draw 0.4s ease-out 0.15s both;
+}
+
+@keyframes check-pop {
+  0% { opacity: 0; transform: scale(0.4); }
+  60% { transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes check-draw {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
 }
 
 @keyframes modal-backdrop {
