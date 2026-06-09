@@ -43,7 +43,6 @@ export function SavePostForm({
         loadExistingData(blogToEdit);
       }
     } else if (mode === FormMode.EditDraft) {
-      // Drafts still live in localStorage until a backend endpoint exists.
       const draftToEdit = blogData?.id
         ? getDraftByIdFromStorage(blogData.id)
         : null;

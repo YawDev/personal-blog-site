@@ -2,9 +2,12 @@
 
 import { Draft, User } from "@/types/types";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ConfirmDeleteModal } from "../shared/ConfirmDeleteModal";
 import { deleteDraftApi } from "@/service/PersonalBlogService";
+import NumberedPagination from "../shared/NumberedPagination";
+import { maxValueToDisplay } from "@/utils/pagination/VisiblePostSetttings";
+import AlertMessage from "../shared/AlertMessage";
 
 // const dummyDrafts: Draft[] = [
 //   {
@@ -67,23 +70,76 @@ const DraftList = ({
   const drafts = fetchedDrafts.length > 0 ? fetchedDrafts : []; // Fallback to empty array if no drafts found or API returns null
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentDrafts, setCurrentDrafts] = useState<Draft[]>(drafts); // Local state to manage drafts list
+  const [currentPage, setCurrentPage] = useState(1);
+  const [deleteDraftResult, setDeleteDraftResult] = useState<string | null>(
+    null,
+  );
+  const [showToast, setShowToast] = useState(false);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(currentDrafts.length / maxValueToDisplay),
+  );
+
+  // Keep the page in range when drafts shrink (e.g. deleting the last item on a page).
+  useEffect(() => {
+    setCurrentPage((prev) => Math.min(prev, totalPages));
+  }, [totalPages]);
+
+  // Fade the delete result toast in, hold it, then fade out and unmount.
+  useEffect(() => {
+    if (!deleteDraftResult) return;
+    // Flip to visible on the next frame so the opacity/slide transition runs.
+    const fadeIn = requestAnimationFrame(() => setShowToast(true));
+    const fadeOut = setTimeout(() => setShowToast(false), 4000);
+    const unmount = setTimeout(() => setDeleteDraftResult(null), 4300);
+    return () => {
+      cancelAnimationFrame(fadeIn);
+      clearTimeout(fadeOut);
+      clearTimeout(unmount);
+    };
+  }, [deleteDraftResult]);
+
+  const indexOfLast = currentPage * maxValueToDisplay;
+  const paginatedDrafts = currentDrafts.slice(
+    indexOfLast - maxValueToDisplay,
+    indexOfLast,
+  );
 
   const handleDelete = async (draftid: string) => {
     // Implement delete logic here, e.g., call API to delete draft
     var success = await deleteDraftApi(draftid, _currentUser?.id ?? "");
     if (success) {
-      alert("Draft deleted successfully.");
+      setDeleteDraftResult("Draft deleted successfully.");
       // Optionally, you can also remove the deleted draft from the local state to update the UI immediately
       setCurrentDrafts((prevDrafts) =>
         prevDrafts.filter((draft) => draft.id !== draftid),
       );
     } else {
-      alert("Failed to delete draft. Please try again.");
+      setDeleteDraftResult("Failed to delete draft. Please try again.");
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Transient toast for delete result — auto-dismisses after a few seconds. */}
+      {deleteDraftResult && (
+        <div
+          className={`fixed top-6 left-1/2 z-50 w-full max-w-md px-4 transition-all duration-300 ease-out ${
+            showToast
+              ? "-translate-x-1/2 translate-y-0 opacity-100"
+              : "-translate-x-1/2 -translate-y-2 opacity-0"
+          }`}
+        >
+          <AlertMessage
+            message={deleteDraftResult}
+            variant={
+              deleteDraftResult.includes("successfully") ? "default" : "error"
+            }
+          />
+        </div>
+      )}
+
       {/* Page header */}
       <div className="border-b border-slate-200 bg-white px-6 py-8">
         <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
@@ -152,7 +208,7 @@ const DraftList = ({
           </div>
         ) : (
           <ul className="divide-y divide-slate-200 rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-            {currentDrafts.map((draft) => (
+            {paginatedDrafts.map((draft) => (
               <li
                 key={draft.id}
                 className="group flex flex-col sm:flex-row sm:items-center gap-4 px-6 py-5 hover:bg-slate-50 transition-colors duration-150"
@@ -235,6 +291,16 @@ const DraftList = ({
               </li>
             ))}
           </ul>
+        )}
+
+        {currentDrafts.length > 0 && (
+          <div className="mt-8">
+            <NumberedPagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={setCurrentPage}
+            />
+          </div>
         )}
       </div>
     </div>

@@ -1,7 +1,7 @@
-import BlogList from "@/components/blog/Blogs";
-import { fetchAllDraftsByUser, fetchAllPosts } from "@/utils/serverApi";
+import { fetchAllDraftsByUser } from "@/utils/serverApi";
 import { getInitialUser } from "@/utils/authUtil";
 import DraftList from "@/components/draft/Drafts";
+import { redirect, unauthorized } from "next/navigation";
 
 export default async function DraftsPage({
   searchParams,
@@ -15,6 +15,13 @@ export default async function DraftsPage({
   ]);
 
   const isLoggedIn = !!user;
+
+  if(!isLoggedIn){
+    redirect("/identity/login")
+  }
+
+  if(id !== user?.id)
+    return unauthorized()
 
   return (
     <>

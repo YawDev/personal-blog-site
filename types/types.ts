@@ -17,6 +17,7 @@ export interface IPost {
 
 export type Blog = IPost & {
   datePosted: string;
+  author?: string;
   userId: string;
 };
 
@@ -56,6 +57,13 @@ export type SavePostRequest = {
   userId: string | null;
 };
 
+export type EmailShareLinkRequest = {
+  postId: string;
+  recipientEmail: string;
+  identityUserId: string | null;
+  blogShareLink: string;
+};
+
 export type EditProfileRequest = {
   FirstName: string;
   LastName: string;
@@ -77,6 +85,12 @@ export type IPagination = {
 
 // BFF API Response
 export type LoginResponse = {
+  status: number;
+  data: User | null;
+  message: string;
+};
+
+export type RefreshTokenResponse = {
   status: number;
   data: User | null;
   message: string;
@@ -115,6 +129,16 @@ export type UpstreamLoginResponse = {
   message?: string;
 };
 
+export type UpstreamRefreshUserSessionResponse = {
+  user?: {
+    id?: string;
+    userName?: string;
+    email?: string;
+    Email?: string;
+  };
+  message?: string;
+};
+
 export type UpstreamBlogsResponse = {
   blogs?: [];
   message?: string;
@@ -127,6 +151,7 @@ export type UpstreamBlogByIdResponse = {
     content: string;
     preview: string;
     datePosted: string;
+    author: string;
     userId: string;
   };
   message?: string;
@@ -163,6 +188,12 @@ export type PublishPostResponse = {
   status: number;
   message: string;
   postGuid?: string | null;
+};
+
+export type EmailShareLinkResponse = {
+  status: number;
+  message: string;
+  eventGuid?: string | null;
 };
 
 export type UpdateDraftResponse = {

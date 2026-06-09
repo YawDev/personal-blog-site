@@ -6,7 +6,12 @@ export async function POST(request: Request) {
   try {
     const httpClient = createHttpClient();
 
-    const response = await httpClient.post("/api/auth/logout", null);
+    const cookieHeader = request.headers.get("cookie") ?? "";
+    const response = await httpClient.post("/api/auth/logout", null, {
+      headers: {
+        Cookie: cookieHeader,
+      },
+    });
 
     console.log("Backend response status:", response.status);
     console.log("Backend response data:", response.data);
@@ -20,7 +25,17 @@ export async function POST(request: Request) {
       { status: 200 },
     );
 
+    // Forward the cookie deletions from the .NET backend
+    const setCookie = response.headers["set-cookie"];
+    if (setCookie) {
+      const cookies = Array.isArray(setCookie) ? setCookie : [setCookie];
+      cookies.forEach((cookie) =>
+        res.headers.append("Set-Cookie", cookie),
+      );
+    }
+
     res.cookies.delete("access_token");
+    res.cookies.delete("refresh_token");
 
     return res;
   } catch (error) {

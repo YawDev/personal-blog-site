@@ -134,8 +134,8 @@ export default function EditProfileForm({
                   formError: formState.userName.error,
                 }}
               />
-
-              {/* First Name Field */}
+              {/* TODO: Backend doesnt support fields currently. DB table Changes required to edit/save first and last name fields, need to update API and DB before enabling these fields on the form */}
+              {/* First Name Field
               <InputFormField
                 formLabelProps={{
                   htmlFor: "firstName",
@@ -161,7 +161,7 @@ export default function EditProfileForm({
               />
 
               {/* Last Name Field */}
-              <InputFormField
+              {/* <InputFormField
                 formLabelProps={{
                   htmlFor: "lastName",
                   className: "block text-sm font-semibold text-gray-700 mb-2",
@@ -182,8 +182,8 @@ export default function EditProfileForm({
                       : "border-gray-200 focus:border-teal-500 hover:border-teal-300"
                   }`,
                   formError: formState.lastName.error,
-                }}
-              />
+                }} 
+              /> */}
 
               {/* Email Field */}
               <InputFormField
