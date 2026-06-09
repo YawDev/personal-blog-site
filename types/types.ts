@@ -17,6 +17,7 @@ export interface IPost {
 
 export type Blog = IPost & {
   datePosted: string;
+  author?: string;
   userId: string;
 };
 
@@ -150,6 +151,7 @@ export type UpstreamBlogByIdResponse = {
     content: string;
     preview: string;
     datePosted: string;
+    author: string;
     userId: string;
   };
   message?: string;

@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/dist/client/link";
 
 const Footer = () => {
   return (
@@ -13,24 +14,24 @@ const Footer = () => {
         </div>
 
         <div className="flex gap-6">
-          <a
-            href="#about"
+          <Link
+            href="/about"
             className="text-teal-100 hover:text-white transition-colors"
           >
             About
-          </a>
-          <a
-            href="#privacy"
+          </Link>
+          <Link
+            href="/privacy"
             className="text-teal-100 hover:text-white transition-colors"
           >
             Privacy
-          </a>
-          <a
-            href="#contact"
+          </Link>
+          <Link
+            href="/contact"
             className="text-teal-100 hover:text-white transition-colors"
           >
             Contact
-          </a>
+          </Link>
         </div>
       </div>
     </footer>

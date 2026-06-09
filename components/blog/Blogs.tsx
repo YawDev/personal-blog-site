@@ -3,7 +3,7 @@
 import { Blog, IPagination, User } from "@/types/types";
 import BlogItem from "./BlogItem";
 import ShowMoreButton from "./ShowMore";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { GetCurrentItems } from "@/utils/pagination/Filtering";
 import Pagination from "./Pagination";
 import {
@@ -15,6 +15,8 @@ import {
   getBlogsFromStorage,
 } from "@/utils/browser/localStorageFallback";
 import BlogSearch from "./Search";
+import AlertMessage from "../shared/AlertMessage";
+import { useAlertMessage } from "@/hooks/useAlertMessage";
 const BlogList = ({
   fetchedBlogs,
   currentUser,
@@ -28,6 +30,7 @@ const BlogList = ({
   const [showMyPostsOnly, setShowMyPostsOnly] = useState(false);
   const [sortByOldest, setSortByOldest] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const alert = useAlertMessage("deletedPost", "Post successfully deleted!");
 
   useEffect(() => {
     // Use API results; fall back to localStorage only if the flag is on (dev-only).
@@ -61,12 +64,11 @@ const BlogList = ({
             .includes(searchQuery.toLowerCase() || "");
         });
 
-  const sortedBlogsByDate = [...filteredBlogs].sort(
-    (a,b) => sortByOldest
+  const sortedBlogsByDate = [...filteredBlogs].sort((a, b) =>
+    sortByOldest
       ? new Date(a.datePosted).getTime() - new Date(b.datePosted).getTime()
-      : new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime()
+      : new Date(b.datePosted).getTime() - new Date(a.datePosted).getTime(),
   );
-
 
   useEffect(() => {
     if (filteredBlogs) {
@@ -87,11 +89,25 @@ const BlogList = ({
   const totalPostsOnThisPage = currentItems.length; // Actual total of available posts before slicing!
   currentItems = currentItems.slice(0, visiblePostsCount);
 
-  return blogs?.length === 0 ? (
-    <section className="container mx-auto px-4 py-20">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Latest Posts</h2>
+  return (
+    <>
+      <div
+        className={`mx-auto w-full max-w-md px-4 overflow-hidden transition-all duration-300 ease-out ${
+          alert.show ? "mt-6 max-h-24 opacity-100" : "mt-0 max-h-0 opacity-0"
+        }`}
+      >
+        <AlertMessage
+          message={alert.message}
+          variant={alert.apiStatus !== 200 ? "error" : "default"}
+        />
       </div>
+      {blogs?.length === 0 ? (
+        <section className="container mx-auto px-4 py-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Latest Posts
+            </h2>
+          </div>
       <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-16 text-center border border-gray-100">
         <div className="w-24 h-24 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-8">
           <svg
@@ -156,18 +172,18 @@ const BlogList = ({
           </button>
         )}{" "}
         <button
-            onClick={() => {
-              setSortByOldest((prev) => !prev);
-              setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
-            }}
-            className={`mt-3 px-4 py-2 rounded-full text-sm font-medium border transition-colors duration-200 ${
-              sortByOldest
-                ? "bg-teal-600 text-white border-teal-600"
-                : "bg-white text-teal-600 border-teal-600 hover:bg-teal-50"
-            }`}
-          >
-            {sortByOldest ? "Sort By Newest" : "Sort By Oldest"}
-          </button>
+          onClick={() => {
+            setSortByOldest((prev) => !prev);
+            setPaginationData((prev) => ({ ...prev, currentPage: 1 }));
+          }}
+          className={`mt-3 px-4 py-2 rounded-full text-sm font-medium border transition-colors duration-200 ${
+            sortByOldest
+              ? "bg-teal-600 text-white border-teal-600"
+              : "bg-white text-teal-600 border-teal-600 hover:bg-teal-50"
+          }`}
+        >
+          {sortByOldest ? "Sort By Newest" : "Sort By Oldest"}
+        </button>
         <BlogSearch searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       </div>
       <div className="flex flex-wrap -mx-4">
@@ -194,7 +210,9 @@ const BlogList = ({
           <></>
         )
       }
-    </section>
+        </section>
+      )}
+    </>
   );
 };
 
