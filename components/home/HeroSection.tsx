@@ -20,12 +20,8 @@ const HeroSection = () => {
           >
             Read Latest Articles
           </Link>
-          <Link
-            href="#featured"
-            className="border-2 border-teal-600 text-teal-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-teal-600 hover:text-white transition-colors duration-300"
-          >
-            Featured Content
-          </Link>
+          {/* Featured Content CTA parked in FeaturedContentButton —
+              not rendered until a featured section exists to link to. */}
         </div>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
           <div className="p-6">

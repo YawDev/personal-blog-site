@@ -9,6 +9,7 @@ export const normalizePosts = (payload: any): Blog[] => {
     content: item.content || item.Content,
     preview: item.preview || item.Preview,
     datePosted: item.datePosted || item.DatePosted,
+    author: item.author || item.Author,
     userId: item.userId || item.UserId,
   }));
 };
@@ -21,6 +22,7 @@ export const normalizePost = (payload: any): Blog => {
     content: data.content,
     preview: data.preview,
     datePosted: data.datePosted,
+    author: data.author || data.Author,
     userId: data.userId,
   };
 };
