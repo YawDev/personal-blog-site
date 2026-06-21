@@ -33,6 +33,7 @@ yarn-error.log*
 # env files — block all, but allow the example template
 .env*
 !.env.example
+!.env.production
 
 # vercel
 .vercel
